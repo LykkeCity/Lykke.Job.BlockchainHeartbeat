@@ -12,16 +12,13 @@ namespace Lykke.Job.BlockchainHeartbeat.Modules
     {
         private readonly BlockchainHearbeatSettings _blockchainHearbeatSettings;
         private readonly BlockchainsIntegrationSettings _blockchainsIntegrationSettings;
-        private readonly ILog _log;
 
         public BlockchainsModule(
             BlockchainHearbeatSettings blockchainHearbeatSettings,
-            BlockchainsIntegrationSettings blockchainsIntegrationSettings,
-            ILog log)
+            BlockchainsIntegrationSettings blockchainsIntegrationSettings)
         {
             _blockchainHearbeatSettings = blockchainHearbeatSettings;
             _blockchainsIntegrationSettings = blockchainsIntegrationSettings;
-            _log = log;
         }
 
         protected override void Load(ContainerBuilder builder)

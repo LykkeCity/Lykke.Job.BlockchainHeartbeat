@@ -1,5 +1,13 @@
 ﻿using Autofac;
-using Common.Log;
+using Lykke.Common.Log;
+using Lykke.Job.BlockchainHeartbeat.AzureRepositories.CashoutRegistration;
+using Lykke.Job.BlockchainHeartbeat.AzureRepositories.HeartbeatCashout;
+using Lykke.Job.BlockchainHeartbeat.AzureRepositories.HeartbeatCashoutLock;
+using Lykke.Job.BlockchainHeartbeat.AzureRepositories.LastCashoutEventMoment;
+using Lykke.Job.BlockchainHeartbeat.Core.Domain.CashoutRegistration;
+using Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashout;
+using Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashoutLock;
+using Lykke.Job.BlockchainHeartbeat.Core.Domain.LastCashoutEventMoment;
 using Lykke.Job.BlockchainHeartbeat.Settings.JobSettings;
 using Lykke.SettingsReader;
 
@@ -8,19 +16,37 @@ namespace Lykke.Job.BlockchainHeartbeat.Modules
     public class RepositoriesModule : Module
     {
         private readonly IReloadingManager<DbSettings> _dbSettings;
-        private readonly ILog _log;
 
-        public RepositoriesModule(
-            IReloadingManager<DbSettings> dbSettings,
-            ILog log)
+        public RepositoriesModule(IReloadingManager<DbSettings> dbSettings)
         {
-            _log = log;
             _dbSettings = dbSettings;
         }
 
         protected override void Load(ContainerBuilder builder)
         {
+            builder.Register(p => CashoutRegistrationRepository.Create(
+                    _dbSettings.Nested(x => x.DataConnString),
+                    p.Resolve<ILogFactory>()))
+                .As<ICashoutRegistrationRepository>()
+                .SingleInstance();
 
+            builder.Register(p => HeartbeatCashoutRepository.Create(
+                    _dbSettings.Nested(x => x.DataConnString),
+                    p.Resolve<ILogFactory>()))
+                .As<IHeartbeatCashoutRepository>()
+                .SingleInstance();
+
+            builder.Register(p => HeartbeatCashoutLockRepository.Create(
+                    _dbSettings.Nested(x => x.DataConnString),
+                    p.Resolve<ILogFactory>()))
+                .As<IHeartbeatCashoutLockRepository>()
+                .SingleInstance();
+
+            builder.Register(p => LastCashoutEventMomentRepository.Create(
+                    _dbSettings.Nested(x => x.DataConnString),
+                    p.Resolve<ILogFactory>()))
+                .As<ILastCashoutEventMomentRepository>()
+                .SingleInstance();
         }
     }
 }
