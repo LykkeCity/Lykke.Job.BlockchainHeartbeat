@@ -83,9 +83,8 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
                 return;
             }
             
-            if (aggregate.OnFinished(evt.FinishMoment)) //TODO read from evt prop
+            if (aggregate.OnFinished(evt.FinishMoment))
             {
-
                 sender.SendCommand(new ReleaseCashoutLockCommand
                     {
                         AssetId = aggregate.AssetId,
@@ -99,7 +98,31 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
             }
         }
 
-        //TODO Handle CashoutFailedEvent after LWDEV-8317 release
+        [UsedImplicitly]
+        private async Task Handle(BlockchainCashoutProcessor.Contract.Events.CashoutFailedEvent evt, ICommandSender sender)
+        {
+            var aggregate = await _repository.TryGetAsync(evt.OperationId);
+
+            if (aggregate == null)
+            {
+                //this is not a heartbeat cashout command
+                return;
+            }
+
+            if (aggregate.OnFinished(evt.FinishMoment))
+            {
+                sender.SendCommand(new ReleaseCashoutLockCommand
+                    {
+                        AssetId = aggregate.AssetId,
+                        OperationId = aggregate.OperationId
+                    },
+                    BoundedContext);
+
+                _chaosKitty.Meow(evt.OperationId);
+
+                await _repository.SaveAsync(aggregate);
+            }
+        }
 
         [UsedImplicitly]
         private async Task Handle(CashoutLockReleasedEvent evt, ICommandSender sender)

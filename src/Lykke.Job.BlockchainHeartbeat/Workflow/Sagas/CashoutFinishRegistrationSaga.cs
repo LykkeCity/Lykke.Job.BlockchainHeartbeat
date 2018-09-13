@@ -47,6 +47,31 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
         }
 
         [UsedImplicitly]
+        private async Task Handle(BlockchainCashoutProcessor.Contract.Events.CashoutFailedEvent evt, ICommandSender sender)
+        {
+            var aggregate = await _repository.GetOrAddAsync(
+                evt.OperationId,
+                () => CashoutFinishRegistrationAggregate.StartNew(evt.OperationId,
+                    evt.AssetId,
+                    evt.FinishMoment));
+
+            if (aggregate.OnFinishMomentRegistrationStarted())
+            {
+                sender.SendCommand(new RegisterFinishMomentCommand
+                    {
+                        AssetId = aggregate.AssetId,
+                        CashoutFinishedAt = aggregate.CashoutFinishedAt,
+                        OperationId = aggregate.OperationId
+                    },
+                    BoundedContext);
+
+                _chaosKitty.Meow(evt.OperationId);
+
+                await _repository.SaveAsync(aggregate);
+            }
+        }
+
+        [UsedImplicitly]
         private async Task Handle(FinishMomentRegisteredEvent evt, ICommandSender sender)
         {
             var aggregate = await _repository.GetAsync(evt.OperationId);
