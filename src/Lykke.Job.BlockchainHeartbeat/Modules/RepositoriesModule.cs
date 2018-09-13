@@ -1,12 +1,12 @@
 ﻿using Autofac;
 using Lykke.Common.Log;
+using Lykke.Job.BlockchainHeartbeat.AzureRepositories.CashoutLock;
 using Lykke.Job.BlockchainHeartbeat.AzureRepositories.CashoutRegistration;
 using Lykke.Job.BlockchainHeartbeat.AzureRepositories.HeartbeatCashout;
-using Lykke.Job.BlockchainHeartbeat.AzureRepositories.HeartbeatCashoutLock;
 using Lykke.Job.BlockchainHeartbeat.AzureRepositories.LastCashoutEventMoment;
+using Lykke.Job.BlockchainHeartbeat.Core.Domain.CashoutLock;
 using Lykke.Job.BlockchainHeartbeat.Core.Domain.CashoutRegistration;
 using Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashout;
-using Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashoutLock;
 using Lykke.Job.BlockchainHeartbeat.Core.Domain.LastCashoutEventMoment;
 using Lykke.Job.BlockchainHeartbeat.Settings.JobSettings;
 using Lykke.SettingsReader;
@@ -36,10 +36,10 @@ namespace Lykke.Job.BlockchainHeartbeat.Modules
                 .As<IHeartbeatCashoutRepository>()
                 .SingleInstance();
 
-            builder.Register(p => HeartbeatCashoutLockRepository.Create(
+            builder.Register(p => CashoutLockRepository.Create(
                     _dbSettings.Nested(x => x.DataConnString),
                     p.Resolve<ILogFactory>()))
-                .As<IHeartbeatCashoutLockRepository>()
+                .As<ICashoutLockRepository>()
                 .SingleInstance();
 
             builder.Register(p => LastCashoutEventMomentRepository.Create(

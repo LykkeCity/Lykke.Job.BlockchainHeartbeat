@@ -3,38 +3,38 @@ using System.Threading.Tasks;
 using AzureStorage;
 using AzureStorage.Tables;
 using Lykke.Common.Log;
-using Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashoutLock;
+using Lykke.Job.BlockchainHeartbeat.Core.Domain.CashoutLock;
 using Lykke.SettingsReader;
 
-namespace Lykke.Job.BlockchainHeartbeat.AzureRepositories.HeartbeatCashoutLock
+namespace Lykke.Job.BlockchainHeartbeat.AzureRepositories.CashoutLock
 {
-    public class HeartbeatCashoutLockRepository:IHeartbeatCashoutLockRepository
+    public class CashoutLockRepository:ICashoutLockRepository
     {
-        private readonly INoSQLTableStorage<HeartbeatCashoutLockEntity> _storage;
+        private readonly INoSQLTableStorage<CashoutLockEntity> _storage;
 
-        public static IHeartbeatCashoutLockRepository Create(IReloadingManager<string> connectionString, ILogFactory logFactory)
+        public static ICashoutLockRepository Create(IReloadingManager<string> connectionString, ILogFactory logFactory)
         {
-            var storage = AzureTableStorage<HeartbeatCashoutLockEntity>.Create(
+            var storage = AzureTableStorage<CashoutLockEntity>.Create(
                 connectionString,
                 "HeartbeatCashoutLocks",
                 logFactory);
 
-            return new HeartbeatCashoutLockRepository(storage);
+            return new CashoutLockRepository(storage);
         }
 
-        private HeartbeatCashoutLockRepository(INoSQLTableStorage<HeartbeatCashoutLockEntity> storage)
+        private CashoutLockRepository(INoSQLTableStorage<CashoutLockEntity> storage)
         {
             _storage = storage;
         }
 
         public async Task<bool> TryGetLockAsync(string blockchainType, string assetId, Guid operationId)
         {
-            var partitionKey = HeartbeatCashoutLockEntity.GetPartitionKey(blockchainType);
-            var rowKey = HeartbeatCashoutLockEntity.GetRowKey(assetId);
+            var partitionKey = CashoutLockEntity.GetPartitionKey(blockchainType);
+            var rowKey = CashoutLockEntity.GetRowKey(assetId);
 
 
             var lockEntity = await _storage.GetOrInsertAsync(partitionKey, rowKey,
-                () => new HeartbeatCashoutLockEntity
+                () => new CashoutLockEntity
                 {
                     PartitionKey = partitionKey,
                     RowKey = rowKey,
@@ -46,8 +46,8 @@ namespace Lykke.Job.BlockchainHeartbeat.AzureRepositories.HeartbeatCashoutLock
 
         public async Task<bool> ReleaseLockAsync(string blockchainType, string assetId, Guid operationId)
         {
-            var partitionKey = HeartbeatCashoutLockEntity.GetPartitionKey(blockchainType);
-            var rowKey = HeartbeatCashoutLockEntity.GetRowKey(assetId);
+            var partitionKey = CashoutLockEntity.GetPartitionKey(blockchainType);
+            var rowKey = CashoutLockEntity.GetRowKey(assetId);
 
             return await _storage.DeleteIfExistAsync(
                 partitionKey,

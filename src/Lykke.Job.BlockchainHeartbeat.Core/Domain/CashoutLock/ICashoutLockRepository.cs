@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashoutLock
+namespace Lykke.Job.BlockchainHeartbeat.Core.Domain.CashoutLock
 {
-    public interface IHeartbeatCashoutLockRepository
+    public interface ICashoutLockRepository
     {
         Task<bool> TryGetLockAsync(string blockchainType, string assetId, Guid operationId);
         Task<bool> ReleaseLockAsync(string blockchainType, string assetId, Guid operationId);

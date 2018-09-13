@@ -53,8 +53,8 @@
     <ProjectReference Include="..\Lykke.Job.BlockchainHeartbeat.Services\Lykke.Job.BlockchainHeartbeat.Services.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Workflow\CommandHandlers\" />
-    <Folder Include="Workflow\Commands\" />
-    <Folder Include="Workflow\Events\" />
+    <Folder Include="Workflow\CommandHandlers\CashoutRegistration\" />
+    <Folder Include="Workflow\Commands\CashoutRegistration\" />
+    <Folder Include="Workflow\Events\CashoutRegistration\" />
   </ItemGroup>
 </Project>

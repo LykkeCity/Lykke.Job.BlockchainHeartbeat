@@ -1,9 +1,9 @@
 ﻿using System;
 using Lykke.AzureStorage.Tables;
 
-namespace Lykke.Job.BlockchainHeartbeat.AzureRepositories.HeartbeatCashoutLock
+namespace Lykke.Job.BlockchainHeartbeat.AzureRepositories.CashoutLock
 {
-    internal class HeartbeatCashoutLockEntity:AzureTableEntity
+    internal class CashoutLockEntity:AzureTableEntity
     {
         public string BlockchainType { get; set; }
 
