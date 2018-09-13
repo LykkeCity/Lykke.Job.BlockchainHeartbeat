@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Autofac;
-using Common.Log;
 using Lykke.Common.Log;
 using Lykke.Cqrs;
 using Lykke.Job.BlockchainHeartbeat.Settings.JobSettings;
@@ -48,7 +47,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Modules
                         }
                     }),
                     new RabbitMqTransportFactory(c.Resolve<ILogFactory>())))
-                .AsSelf()
+                .As<IMessagingEngine>()
                 .SingleInstance()
                 .AutoActivate();
 
@@ -59,7 +58,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Modules
                 .AsSelf();
 
             // Sagas
-            builder.RegisterType<CashoutRegistrationSaga>();
+            builder.RegisterType<CashoutFinishRegistrationSaga>();
             builder.RegisterType<HeartBeatCashoutSaga>();
 
             // Command handlers

@@ -27,26 +27,26 @@ namespace Lykke.Job.BlockchainHeartbeat.AzureRepositories.CashoutLock
             _storage = storage;
         }
 
-        public async Task<bool> TryGetLockAsync(string blockchainType, string assetId, Guid operationId)
+        public async Task<bool> TryGetLockAsync(string assetId, Guid operationId)
         {
-            var partitionKey = CashoutLockEntity.GetPartitionKey(blockchainType);
+            var partitionKey = CashoutLockEntity.GetPartitionKey(assetId);
             var rowKey = CashoutLockEntity.GetRowKey(assetId);
-
 
             var lockEntity = await _storage.GetOrInsertAsync(partitionKey, rowKey,
                 () => new CashoutLockEntity
                 {
                     PartitionKey = partitionKey,
                     RowKey = rowKey,
-                    OperationId = operationId
+                    OperationId = operationId,
+                    AssetId = assetId
                 });
 
             return lockEntity.OperationId == operationId;
         }
 
-        public async Task<bool> ReleaseLockAsync(string blockchainType, string assetId, Guid operationId)
+        public async Task<bool> ReleaseLockAsync(string assetId, Guid operationId)
         {
-            var partitionKey = CashoutLockEntity.GetPartitionKey(blockchainType);
+            var partitionKey = CashoutLockEntity.GetPartitionKey(assetId);
             var rowKey = CashoutLockEntity.GetRowKey(assetId);
 
             return await _storage.DeleteIfExistAsync(
@@ -54,6 +54,14 @@ namespace Lykke.Job.BlockchainHeartbeat.AzureRepositories.CashoutLock
                 rowKey,
                 // Exactly the given transaction should own current lock to remove it
                 lockEntity => lockEntity.OperationId == operationId);
+        }
+
+        public async Task<bool> IsLockedAsync(string assetId)
+        {
+            var partitionKey = CashoutLockEntity.GetPartitionKey(assetId);
+            var rowKey = CashoutLockEntity.GetRowKey(assetId);
+
+            return await _storage.GetDataAsync(partitionKey, rowKey) != null;
         }
     }
 }

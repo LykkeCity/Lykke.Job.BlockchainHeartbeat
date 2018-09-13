@@ -11,18 +11,11 @@ namespace Lykke.Job.BlockchainHeartbeat.AzureRepositories.CashoutRegistration
 
         // ReSharper disable MemberCanBePrivate.Global
         public DateTime StartMoment { get; set; }
-        public DateTime? OperationFinishMoment { get; set; }
-
         public Guid OperationId { get; set; }
-        public Guid ClientId { get; set; }
-        public string BlockchainType { get; set; }
-        public string BlockchainAssetId { get; set; }
-        public string HotWalletAddress { get; set; }
-        public string ToAddress { get; set; }
-        public decimal Amount { get; set; }
         public string AssetId { get; set; }
+        public DateTime CashoutFinishedAt { get; set; }
 
-        public CashoutRegistrationAggregate.State CurrentState { get; set; }
+        public CashoutFinishRegistrationAggregate.State CurrentState { get; set; }
 
         // ReSharper restore MemberCanBePrivate.Global
 
@@ -49,7 +42,7 @@ namespace Lykke.Job.BlockchainHeartbeat.AzureRepositories.CashoutRegistration
 
         #region Conversion
 
-        public static CashoutRegistrationEntity FromDomain(CashoutRegistrationAggregate aggregate)
+        public static CashoutRegistrationEntity FromDomain(CashoutFinishRegistrationAggregate aggregate)
         {
             return new CashoutRegistrationEntity
             {
@@ -57,34 +50,22 @@ namespace Lykke.Job.BlockchainHeartbeat.AzureRepositories.CashoutRegistration
                 PartitionKey = GetPartitionKey(aggregate.OperationId),
                 RowKey = GetRowKey(aggregate.OperationId),
                 StartMoment = aggregate.StartMoment,
-                OperationFinishMoment = aggregate.OperationFinishMoment,
                 OperationId = aggregate.OperationId,
-                ClientId = aggregate.ClientId,
-                BlockchainType = aggregate.BlockchainType,
-                BlockchainAssetId = aggregate.BlockchainAssetId,
-                HotWalletAddress = aggregate.HotWalletAddress,
-                ToAddress = aggregate.ToAddress,
-                Amount = aggregate.Amount,
                 AssetId = aggregate.AssetId,
-                CurrentState = aggregate.CurrentState
+                CurrentState = aggregate.CurrentState,
+                CashoutFinishedAt = aggregate.CashoutFinishedAt
             };
         }
 
-        public CashoutRegistrationAggregate ToDomain()
+        public CashoutFinishRegistrationAggregate ToDomain()
         {
-            return CashoutRegistrationAggregate.Restore(
+            return CashoutFinishRegistrationAggregate.Restore(
                 ETag,
                 StartMoment,
-                OperationFinishMoment,
                 OperationId,
-                ClientId,
-                BlockchainType,
-                BlockchainAssetId,
-                HotWalletAddress,
-                ToAddress,
-                Amount,
                 AssetId,
-                CurrentState);
+                CurrentState,
+                CashoutFinishedAt);
         }
 
         #endregion

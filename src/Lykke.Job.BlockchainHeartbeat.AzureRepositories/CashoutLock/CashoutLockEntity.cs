@@ -5,15 +5,13 @@ namespace Lykke.Job.BlockchainHeartbeat.AzureRepositories.CashoutLock
 {
     internal class CashoutLockEntity:AzureTableEntity
     {
-        public string BlockchainType { get; set; }
-
         public string AssetId { get; set; }
 
         public Guid OperationId { get; set; }
 
-        public static string GetPartitionKey(string blockchainType)
+        public static string GetPartitionKey(string assetId)
         {
-            return blockchainType;
+            return assetId;
         }
 
         public static string GetRowKey(string assetId)

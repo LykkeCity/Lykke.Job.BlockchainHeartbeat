@@ -20,15 +20,15 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Lykke.Common.ApiLibrary" Version="1.10.1" />
-    <PackageReference Include="Lykke.Cqrs" Version="5.1.0" />
-    <PackageReference Include="Lykke.Job.BlockchainOperationsExecutor.Contract" Version="10.0.0" />
+    <PackageReference Include="Lykke.Cqrs" Version="5.2.0" />
+    <PackageReference Include="Lykke.Job.BlockchainCashoutProcessor.Contract" Version="2.2.0" />
     <!-- #if azurequeuesub -->
     <PackageReference Include="Lykke.JobTriggers" Version="2.2.0" />
     <!-- #endif -->
     <PackageReference Include="Lykke.Logs" Version="6.0.0" />
-    <PackageReference Include="Lykke.Messaging" Version="6.1.0" />
+    <PackageReference Include="Lykke.Messaging" Version="6.2.0" />
     <PackageReference Include="Lykke.Messaging.RabbitMq" Version="2.1.0" />
-    <PackageReference Include="Lykke.MonitoringServiceApiCaller" Version="1.6.2" />
+    <PackageReference Include="Lykke.MonitoringServiceApiCaller" Version="1.6.4" />
     <!-- #if rabbitpub -->
     <!-- #endif -->
     <!-- #if rabbitpub || rabbitsub -->
@@ -51,10 +51,5 @@
     <ProjectReference Include="..\Lykke.Job.BlockchainHeartbeat.AzureRepositories\Lykke.Job.BlockchainHeartbeat.AzureRepositories.csproj" />
     <ProjectReference Include="..\Lykke.Job.BlockchainHeartbeat.Core\Lykke.Job.BlockchainHeartbeat.Core.csproj" />
     <ProjectReference Include="..\Lykke.Job.BlockchainHeartbeat.Services\Lykke.Job.BlockchainHeartbeat.Services.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Workflow\CommandHandlers\CashoutRegistration\" />
-    <Folder Include="Workflow\Commands\CashoutRegistration\" />
-    <Folder Include="Workflow\Events\CashoutRegistration\" />
   </ItemGroup>
 </Project>

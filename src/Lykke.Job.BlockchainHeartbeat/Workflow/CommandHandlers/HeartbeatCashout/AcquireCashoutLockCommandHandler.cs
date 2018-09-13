@@ -7,32 +7,31 @@ using Lykke.Job.BlockchainHeartbeat.Workflow.Events.HeartbeatCashout;
 
 namespace Lykke.Job.BlockchainHeartbeat.Workflow.CommandHandlers.HeartbeatCashout
 {
-    public class LockCashoutCommandHandler
+    public class AcquireCashoutLockCommandHandler
     {
         private readonly ICashoutLockRepository _cashoutLockRepository;
         private readonly IChaosKitty _chaosKitty;
 
-        public LockCashoutCommandHandler(ICashoutLockRepository cashoutLockRepository, 
+        public AcquireCashoutLockCommandHandler(ICashoutLockRepository cashoutLockRepository, 
             IChaosKitty chaosKitty)
         {
             _cashoutLockRepository = cashoutLockRepository;
             _chaosKitty = chaosKitty;
         }
 
-        public async Task<CommandHandlingResult> Handle(LockCashoutCommand command,
+        public async Task<CommandHandlingResult> Handle(AcquireCashoutLockCommand command,
             IEventPublisher publisher)
         {
-            if(await _cashoutLockRepository.TryGetLockAsync(command.BlockchainType, 
-                command.AssetId, 
+            if(await _cashoutLockRepository.TryGetLockAsync(command.AssetId, 
                 command.OperationId))
             {
-                publisher.PublishEvent(new CashoutLockedEvent
+                _chaosKitty.Meow(command.OperationId);
+
+                publisher.PublishEvent(new CashoutLockAcquiredEvent
                 {
                     OperationId = command.OperationId
                 });
             }
-
-            _chaosKitty.Meow(command.OperationId);
 
             return CommandHandlingResult.Ok();
         }

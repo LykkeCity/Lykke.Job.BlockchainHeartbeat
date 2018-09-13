@@ -27,22 +27,21 @@ namespace Lykke.Job.BlockchainHeartbeat.AzureRepositories.LastCashoutEventMoment
             _storage = storage;
         }
 
-        public Task SetLastCashoutEventMomentAsync(string blockchainType, string assetId, DateTime eventMoment)
+        public Task<bool> SetLastCashoutEventMomentAsync(string assetId, DateTime eventMoment)
         {
             return _storage.InsertOrReplaceAsync(new LastCashoutEventMomentEntity
             {
                 AssetId = assetId,
-                BlockchainType = blockchainType,
                 Moment = eventMoment,
-                PartitionKey = LastCashoutEventMomentEntity.GetPartitionKey(blockchainType),
+                PartitionKey = LastCashoutEventMomentEntity.GetPartitionKey(assetId),
                 RowKey = LastCashoutEventMomentEntity.GetRowKey(assetId)
             }, p => p.Moment <= eventMoment);
         }
 
-        public async Task<DateTime?> GetLastEventMomentAsync(string blockchainType, string assetId)
+        public async Task<DateTime?> GetLastEventMomentAsync(string assetId)
         {
             return (await _storage.GetDataAsync(
-                    LastCashoutEventMomentEntity.GetPartitionKey(blockchainType),
+                    LastCashoutEventMomentEntity.GetPartitionKey(assetId),
                     LastCashoutEventMomentEntity.GetRowKey(assetId)))
                 ?.Moment;
         }

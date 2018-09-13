@@ -8,11 +8,11 @@ using Lykke.SettingsReader;
 
 namespace Lykke.Job.BlockchainHeartbeat.AzureRepositories.CashoutRegistration
 {
-    public class CashoutRegistrationRepository: ICashoutRegistrationRepository
+    public class CashoutFinishRegistrationRepository: ICashoutFinishRegistrationRepository
     {
-        private readonly AggregateRepository<CashoutRegistrationAggregate, CashoutRegistrationEntity> _aggregateRepository;
+        private readonly AggregateRepository<CashoutFinishRegistrationAggregate, CashoutRegistrationEntity> _aggregateRepository;
 
-        public static ICashoutRegistrationRepository Create(
+        public static ICashoutFinishRegistrationRepository Create(
             IReloadingManager<string> connectionString,
             ILogFactory log)
         {
@@ -21,33 +21,33 @@ namespace Lykke.Job.BlockchainHeartbeat.AzureRepositories.CashoutRegistration
                 "CashoutRegistrations",
                 log);
 
-            return new CashoutRegistrationRepository(storage);
+            return new CashoutFinishRegistrationRepository(storage);
         }
 
-        private CashoutRegistrationRepository(INoSQLTableStorage<CashoutRegistrationEntity> storage)
+        private CashoutFinishRegistrationRepository(INoSQLTableStorage<CashoutRegistrationEntity> storage)
         {
-            _aggregateRepository = new AggregateRepository<CashoutRegistrationAggregate, CashoutRegistrationEntity>(
+            _aggregateRepository = new AggregateRepository<CashoutFinishRegistrationAggregate, CashoutRegistrationEntity>(
                 storage,
                 mapAggregateToEntity: CashoutRegistrationEntity.FromDomain,
                 mapEntityToAggregate: entity => Task.FromResult(entity.ToDomain()));
         }
 
-        public Task<CashoutRegistrationAggregate> GetOrAddAsync(Guid aggregateId, Func<CashoutRegistrationAggregate> newAggregateFactory)
+        public Task<CashoutFinishRegistrationAggregate> GetOrAddAsync(Guid aggregateId, Func<CashoutFinishRegistrationAggregate> newAggregateFactory)
         {
             return _aggregateRepository.GetOrAddAsync(aggregateId, newAggregateFactory);
         }
 
-        public Task<CashoutRegistrationAggregate> GetAsync(Guid operationId)
+        public Task<CashoutFinishRegistrationAggregate> GetAsync(Guid operationId)
         {
             return _aggregateRepository.GetAsync(operationId);
         }
 
-        public Task SaveAsync(CashoutRegistrationAggregate aggregate)
+        public Task SaveAsync(CashoutFinishRegistrationAggregate aggregate)
         {
             return _aggregateRepository.SaveAsync(aggregate);
         }
 
-        public Task<CashoutRegistrationAggregate> TryGetAsync(Guid aggregateId)
+        public Task<CashoutFinishRegistrationAggregate> TryGetAsync(Guid aggregateId)
         {
             return _aggregateRepository.TryGetAsync(aggregateId);
         }

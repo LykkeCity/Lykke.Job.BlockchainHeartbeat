@@ -9,9 +9,6 @@ namespace Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashout
         public DateTime? OperationFinishMoment { get; private set; }
         public Guid OperationId { get; }
         public Guid ClientId { get; }
-        public string BlockchainType { get; }
-        public string BlockchainAssetId { get; }
-        public string HotWalletAddress { get; }
         public string ToAddress { get; }
         public decimal Amount { get; }
         public string AssetId { get; }
@@ -23,9 +20,6 @@ namespace Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashout
             DateTime? operationFinishMoment,
             Guid operationId,
             Guid clientId,
-            string blockchainType,
-            string blockchainAssetId,
-            string hotWalletAddress,
             string toAddress,
             decimal amount,
             string assetId,
@@ -36,9 +30,6 @@ namespace Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashout
             OperationFinishMoment = operationFinishMoment;
             OperationId = operationId;
             ClientId = clientId;
-            BlockchainType = blockchainType;
-            BlockchainAssetId = blockchainAssetId;
-            HotWalletAddress = hotWalletAddress;
             ToAddress = toAddress;
             Amount = amount;
             AssetId = assetId;
@@ -48,9 +39,6 @@ namespace Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashout
         public static HeartbeatCashoutAggregate StartNew(
             Guid operationId,
             Guid clientId,
-            string blockchainType,
-            string blockchainAssetId,
-            string hotWalletAddress,
             string toAddress,
             decimal amount,
             string assetId)
@@ -60,10 +48,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashout
                 operationFinishMoment: null,
                 operationId: operationId,
                 clientId: clientId,
-                blockchainType: blockchainType,
-                blockchainAssetId: blockchainAssetId,
                 amount: amount, assetId: assetId,
-                hotWalletAddress: hotWalletAddress,
                 toAddress: toAddress,
                 currentState: State.Started);
         }
@@ -74,9 +59,6 @@ namespace Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashout
             DateTime? operationFinishMoment,
             Guid operationId,
             Guid clientId,
-            string blockchainType,
-            string blockchainAssetId,
-            string hotWalletAddress,
             string toAddress,
             decimal amount,
             string assetId,
@@ -87,17 +69,62 @@ namespace Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashout
                 operationFinishMoment: operationFinishMoment,
                 operationId: operationId,
                 clientId: clientId,
-                blockchainType: blockchainType,
-                blockchainAssetId: blockchainAssetId,
                 amount: amount, assetId: assetId,
-                hotWalletAddress: hotWalletAddress,
                 toAddress: toAddress,
                 currentState: currentState);
+        }
+        public bool OnStarted()
+        {
+            if (CurrentState == State.Started)
+            {
+                return true;
+            }
+
+            return false;
+        }
+        
+        public bool OnLockAcquired()
+        {
+            if (CurrentState == State.Started)
+            {
+                CurrentState = State.LockAcquired;
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool OnFinished(DateTime finisDateTime)
+        {
+            if (CurrentState == State.LockAcquired)
+            {
+                CurrentState = State.Finished;
+                OperationFinishMoment = finisDateTime;
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool OnLockReleased()
+        {
+            if (CurrentState == State.Finished)
+            {
+                CurrentState = State.LockReleased;
+
+                return true;
+            }
+
+            return false;
         }
 
         public enum State
         {
-            Started
+            Started,
+            LockAcquired,
+            Finished,
+            LockReleased
         }
     }
 }

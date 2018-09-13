@@ -1,5 +1,4 @@
 ﻿using JetBrains.Annotations;
-using Lykke.Job.BlockchainHeartbeat.Settings.Blockchain;
 using Lykke.Job.BlockchainHeartbeat.Settings.JobSettings;
 using Lykke.Job.BlockchainHeartbeat.Settings.SlackNotifications;
 using Lykke.SettingsReader.Attributes;
@@ -11,9 +10,6 @@ namespace Lykke.Job.BlockchainHeartbeat.Settings
     {
         [UsedImplicitly(ImplicitUseKindFlags.Assign)]
         public BlockchainHearbeatSettings BlockchainHearbeatJob { get; set; }
-
-        [UsedImplicitly(ImplicitUseKindFlags.Assign)]
-        public BlockchainsIntegrationSettings BlockchainsIntegration { get; set; }
 
         [UsedImplicitly(ImplicitUseKindFlags.Assign)]
         public SlackNotificationsSettings SlackNotifications { get; set; }
