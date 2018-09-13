@@ -7,28 +7,28 @@ using Lykke.Job.BlockchainHeartbeat.Workflow.Events.CashoutFinishRegistration;
 
 namespace Lykke.Job.BlockchainHeartbeat.Workflow.CommandHandlers.CashoutFinishRegistration
 {
-    public class RegisterFinishCommandHandler
+    public class RegisterFinishMomentCommandHandler
     {
         private readonly IChaosKitty _chaosKitty;
         private readonly ILastCashoutEventMomentRepository _lastMomentRepository;
 
-        public RegisterFinishCommandHandler(IChaosKitty chaosKitty, 
+        public RegisterFinishMomentCommandHandler(IChaosKitty chaosKitty, 
             ILastCashoutEventMomentRepository lastMomentRepository)
         {
             _chaosKitty = chaosKitty;
             _lastMomentRepository = lastMomentRepository;
         }
 
-        public async Task<CommandHandlingResult> Handle(RegisterFinishCommand command,
+        public async Task<CommandHandlingResult> Handle(RegisterFinishMomentCommand momentCommand,
             IEventPublisher publisher)
         {
-            if (await _lastMomentRepository.SetLastCashoutEventMomentAsync(command.AssetId, command.CashoutFinishedAt))
+            if (await _lastMomentRepository.SetLastCashoutEventMomentAsync(momentCommand.AssetId, momentCommand.CashoutFinishedAt))
             {
-                _chaosKitty.Meow(command.OperationId);
+                _chaosKitty.Meow(momentCommand.OperationId);
 
-                publisher.PublishEvent(new FinishRegisteredEvent
+                publisher.PublishEvent(new FinishMomentRegisteredEvent
                 {
-                    OperationId = command.OperationId
+                    OperationId = momentCommand.OperationId
                 });
             }
 

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Lykke.Common.Chaos;
 using Lykke.Cqrs;
@@ -83,9 +82,8 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
                 //this is not a heartbeat cashout command
                 return;
             }
-
-            throw new NotImplementedException("/TODO read from evt prop TODO Handle CashoutFailedEvent after LWDEV-8317 release");
-            if (aggregate.OnFinished(DateTime.UtcNow)) //TODO read from evt prop
+            
+            if (aggregate.OnFinished(evt.FinishMoment)) //TODO read from evt prop
             {
 
                 sender.SendCommand(new ReleaseCashoutLockCommand

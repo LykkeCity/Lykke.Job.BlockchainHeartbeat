@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Lykke.Common.Chaos;
 using Lykke.Cqrs;
@@ -25,17 +24,15 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
         [UsedImplicitly]
         private async Task Handle(BlockchainCashoutProcessor.Contract.Events.CashoutCompletedEvent evt, ICommandSender sender)
         {
-            throw new NotImplementedException("Add failed event and use cashout completed date");
-
             var aggregate = await _repository.GetOrAddAsync(
                 evt.OperationId,
                 () => CashoutFinishRegistrationAggregate.StartNew(evt.OperationId, 
                     evt.AssetId, 
-                    DateTime.UtcNow));
+                    evt.FinishMoment));
 
-            if (aggregate.OnRegistrationStarted())
+            if (aggregate.OnFinishMomentRegistrationStarted())
             {
-                sender.SendCommand(new RegisterFinishCommand
+                sender.SendCommand(new RegisterFinishMomentCommand
                     {
                         AssetId = aggregate.AssetId,
                         CashoutFinishedAt = aggregate.CashoutFinishedAt,
@@ -50,11 +47,11 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
         }
 
         [UsedImplicitly]
-        private async Task Handle(FinishRegisteredEvent evt, ICommandSender sender)
+        private async Task Handle(FinishMomentRegisteredEvent evt, ICommandSender sender)
         {
             var aggregate = await _repository.GetAsync(evt.OperationId);
 
-            if (aggregate.OnFinishRegistered())
+            if (aggregate.OnFinishMomentRegistered())
             {
                 await _repository.SaveAsync(aggregate);
 

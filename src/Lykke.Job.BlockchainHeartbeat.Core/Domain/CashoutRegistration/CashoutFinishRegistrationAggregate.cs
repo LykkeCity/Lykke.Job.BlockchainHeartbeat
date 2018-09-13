@@ -57,7 +57,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Core.Domain.CashoutRegistration
                 cashoutFinishedAt:cashoutCompletedAt);
         }
 
-        public bool OnRegistrationStarted()
+        public bool OnFinishMomentRegistrationStarted()
         {
             if (CurrentState == State.Started)
             {
@@ -68,11 +68,11 @@ namespace Lykke.Job.BlockchainHeartbeat.Core.Domain.CashoutRegistration
         }
 
 
-        public bool OnFinishRegistered()
+        public bool OnFinishMomentRegistered()
         {
             if (CurrentState == State.Started)
             {
-                CurrentState = State.RegistrationCompleted;
+                CurrentState = State.FinishMomentRegistered;
 
                 return true;
             }
@@ -83,7 +83,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Core.Domain.CashoutRegistration
         public enum State
         {
             Started,
-            RegistrationCompleted
+            FinishMomentRegistered
         }
     }
 }

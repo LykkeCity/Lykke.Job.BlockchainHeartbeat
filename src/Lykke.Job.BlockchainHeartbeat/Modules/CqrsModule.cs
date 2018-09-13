@@ -5,6 +5,8 @@ using Lykke.Common.Log;
 using Lykke.Cqrs;
 using Lykke.Job.BlockchainHeartbeat.Settings.JobSettings;
 using Lykke.Job.BlockchainHeartbeat.Workflow;
+using Lykke.Job.BlockchainHeartbeat.Workflow.CommandHandlers.CashoutFinishRegistration;
+using Lykke.Job.BlockchainHeartbeat.Workflow.CommandHandlers.HeartbeatCashout;
 using Lykke.Job.BlockchainHeartbeat.Workflow.Sagas;
 using Lykke.Messaging;
 using Lykke.Messaging.Contract;
@@ -62,6 +64,11 @@ namespace Lykke.Job.BlockchainHeartbeat.Modules
             builder.RegisterType<HeartBeatCashoutSaga>();
 
             // Command handlers
+
+            builder.RegisterType<RegisterFinishMomentCommandHandler>();
+            builder.RegisterType<AcquireCashoutLockCommandHandler>();
+            builder.RegisterType<ReleaseCashoutLockCommandHandler>();
+            builder.RegisterType<StartHeartbeatCashoutCommandHandler>();
 
             builder.Register(CreateEngine)
                 .As<ICqrsEngine>()
