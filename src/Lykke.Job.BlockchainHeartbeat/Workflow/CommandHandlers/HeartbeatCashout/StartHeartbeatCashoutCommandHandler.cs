@@ -20,7 +20,11 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.CommandHandlers.HeartbeatCashou
         {
             publisher.PublishEvent(new HeartbeatCashoutStartedEvent
             {
-                OperationId = command.OperationId
+                OperationId = command.OperationId,
+                Amount = command.Amount,
+                AssetId = command.AssetId,
+                ToAddress = command.ToAddress,
+                ClientId = command.ClientId
             });
 
             _chaosKitty.Meow(command.OperationId);

@@ -90,7 +90,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
                         AssetId = aggregate.AssetId,
                         OperationId = aggregate.OperationId
                     }, 
-                    BoundedContext );
+                    BoundedContext);
 
                 _chaosKitty.Meow(evt.OperationId);
 

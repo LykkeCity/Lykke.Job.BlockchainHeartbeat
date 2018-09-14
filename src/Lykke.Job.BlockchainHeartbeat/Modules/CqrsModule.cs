@@ -1,12 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Autofac;
 using Lykke.Common.Log;
 using Lykke.Cqrs;
+using Lykke.Cqrs.Configuration;
+using Lykke.Job.BlockchainCashoutProcessor.Contract;
 using Lykke.Job.BlockchainHeartbeat.Settings.JobSettings;
 using Lykke.Job.BlockchainHeartbeat.Workflow;
 using Lykke.Job.BlockchainHeartbeat.Workflow.CommandHandlers.CashoutFinishRegistration;
 using Lykke.Job.BlockchainHeartbeat.Workflow.CommandHandlers.HeartbeatCashout;
+using Lykke.Job.BlockchainHeartbeat.Workflow.Commands.CashoutFinishRegistration;
+using Lykke.Job.BlockchainHeartbeat.Workflow.Commands.HeartbeatCashout;
+using Lykke.Job.BlockchainHeartbeat.Workflow.Events.CashoutFinishRegistration;
+using Lykke.Job.BlockchainHeartbeat.Workflow.Events.HeartbeatCashout;
 using Lykke.Job.BlockchainHeartbeat.Workflow.Sagas;
 using Lykke.Messaging;
 using Lykke.Messaging.Contract;
@@ -82,9 +87,95 @@ namespace Lykke.Job.BlockchainHeartbeat.Modules
 
             const string commandsPipeline = "commands";
             const string defaultRoute = "self";
+            const string eventsRoute = "events";
             var messageEngine = ctx.Resolve<IMessagingEngine>();
+            var logFactory = ctx.Resolve<ILogFactory>();
+            var dependencyResolver = ctx.Resolve<IDependencyResolver>();
 
-           throw new NotImplementedException();
+            return new CqrsEngine(logFactory,
+                dependencyResolver,
+                messageEngine,
+                new DefaultEndpointProvider(),
+                true,
+                Register.BoundedContext(CashoutFinishRegistrationSaga.BoundedContext)
+                    .FailedCommandRetryDelay(defaultRetryDelay)
+
+                    .ListeningCommands(typeof(RegisterFinishMomentCommand))
+                    .On(defaultRoute)
+                    .WithCommandsHandler<RegisterFinishMomentCommandHandler>()
+                    .PublishingEvents(typeof(FinishMomentRegisteredEvent))
+                    .With(eventsRoute)
+
+                    .ProcessingOptions(defaultRoute).MultiThreaded(4).QueueCapacity(1024)
+                    .ProcessingOptions(eventsRoute).MultiThreaded(4).QueueCapacity(1024),
+
+                Register.Saga<CashoutFinishRegistrationSaga>($"{CashoutFinishRegistrationSaga.BoundedContext}.saga")
+                    .ListeningEvents(
+                        typeof(BlockchainCashoutProcessor.Contract.Events.CashoutFailedEvent),
+                        typeof(BlockchainCashoutProcessor.Contract.Events.CashoutCompletedEvent))
+                    .From(BlockchainCashoutProcessorBoundedContext.Name)
+                    .On(defaultRoute)
+                    .PublishingCommands(typeof(RegisterFinishMomentCommand))
+                    .To(CashoutFinishRegistrationSaga.BoundedContext)
+                    .With(commandsPipeline)
+
+                    .ListeningEvents(
+                        typeof(FinishMomentRegisteredEvent))
+                    .From(CashoutFinishRegistrationSaga.BoundedContext)
+                    .On(defaultRoute),
+
+                Register.BoundedContext(HeartBeatCashoutSaga.BoundedContext)
+                    .FailedCommandRetryDelay(defaultRetryDelay)
+
+                    .ListeningCommands(typeof(StartHeartbeatCashoutCommand))
+                    .On(defaultRoute)
+                    .WithCommandsHandler<StartHeartbeatCashoutCommandHandler>()
+                    .PublishingEvents(typeof(HeartbeatCashoutStartedEvent))
+                    .With(eventsRoute)
+
+                    .ListeningCommands(typeof(AcquireCashoutLockCommand))
+                    .On(defaultRoute)
+                    .WithCommandsHandler<AcquireCashoutLockCommandHandler>()
+                    .PublishingEvents(typeof(CashoutLockAcquiredEvent))
+                    .With(eventsRoute)
+
+                    .ListeningCommands(typeof(ReleaseCashoutLockCommand))
+                    .On(defaultRoute)
+                    .WithCommandsHandler<ReleaseCashoutLockCommandHandler>()
+                    .PublishingEvents(typeof(CashoutLockReleasedEvent))
+                    .With(eventsRoute)
+
+                    .ProcessingOptions(defaultRoute).MultiThreaded(4).QueueCapacity(1024)
+                    .ProcessingOptions(eventsRoute).MultiThreaded(4).QueueCapacity(1024),
+
+                Register.Saga<HeartBeatCashoutSaga>($"{HeartBeatCashoutSaga.BoundedContext}.saga")
+                    .ListeningEvents(typeof(HeartbeatCashoutStartedEvent))
+                    .From(HeartBeatCashoutSaga.BoundedContext)
+                    .On(defaultRoute)
+                    .PublishingCommands(typeof(AcquireCashoutLockCommand))
+                    .To(HeartBeatCashoutSaga.BoundedContext)
+                    .With(commandsPipeline)
+
+                    .ListeningEvents(typeof(CashoutLockAcquiredEvent))
+                    .From(HeartBeatCashoutSaga.BoundedContext)
+                    .On(defaultRoute)
+                    .PublishingCommands(typeof(BlockchainCashoutProcessor.Contract.Commands.StartCashoutCommand))
+                    .To(BlockchainCashoutProcessorBoundedContext.Name)
+                    .With(commandsPipeline)
+
+                    .ListeningEvents(
+                        typeof(BlockchainCashoutProcessor.Contract.Events.CashoutFailedEvent),
+                        typeof(BlockchainCashoutProcessor.Contract.Events.CashoutCompletedEvent))
+                    .From(BlockchainCashoutProcessorBoundedContext.Name)
+                    .On(defaultRoute)
+                    .PublishingCommands(typeof(ReleaseCashoutLockCommand))
+                    .To(HeartBeatCashoutSaga.BoundedContext)
+                    .With(commandsPipeline)
+
+                    .ListeningEvents(typeof(CashoutLockReleasedEvent))
+                    .From(HeartBeatCashoutSaga.BoundedContext)
+                    .On(defaultRoute)
+                );
         }
     }
 }

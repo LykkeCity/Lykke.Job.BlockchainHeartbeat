@@ -22,7 +22,8 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.CommandHandlers.CashoutFinishRe
         public async Task<CommandHandlingResult> Handle(RegisterFinishMomentCommand momentCommand,
             IEventPublisher publisher)
         {
-            if (await _lastMomentRepository.SetLastCashoutEventMomentAsync(momentCommand.AssetId, momentCommand.CashoutFinishedAt))
+            if (await _lastMomentRepository.SetLastCashoutEventMomentAsync(momentCommand.AssetId,
+                momentCommand.CashoutFinishedAt))
             {
                 _chaosKitty.Meow(momentCommand.OperationId);
 
