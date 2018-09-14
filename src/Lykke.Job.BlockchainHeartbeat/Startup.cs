@@ -84,7 +84,7 @@ namespace Lykke.Job.BlockchainHeartbeat
                 var builder = new ContainerBuilder();
                 builder.Populate(services);
 
-                builder.RegisterModule(new JobModule(appSettings.BlockchainHearbeatJob.ChaosKitty));
+                builder.RegisterModule(new JobModule(appSettings.BlockchainHearbeatJob));
 
                 ApplicationContainer = builder.Build();
 

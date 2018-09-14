@@ -1,4 +1,6 @@
-﻿using JetBrains.Annotations;
+﻿using System;
+using System.Collections.Generic;
+using JetBrains.Annotations;
 using Lykke.Common.Chaos;
 using Lykke.SettingsReader.Attributes;
 
@@ -17,5 +19,10 @@ namespace Lykke.Job.BlockchainHeartbeat.Settings.JobSettings
         [UsedImplicitly(ImplicitUseKindFlags.Assign)]
         public ChaosSettings ChaosKitty { get; set; }
 
+        [UsedImplicitly(ImplicitUseKindFlags.Assign)]
+        public IEnumerable<HeartbeatAssetSettings> Assets { get; set; }
+
+        [UsedImplicitly(ImplicitUseKindFlags.Assign)]
+        public TimeSpan TimerPeriod { get; set; }
     }
 }
