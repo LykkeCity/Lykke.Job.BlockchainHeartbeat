@@ -20,9 +20,6 @@ namespace Lykke.Job.BlockchainHeartbeat.Settings.JobSettings
         public ChaosSettings ChaosKitty { get; set; }
 
         [UsedImplicitly(ImplicitUseKindFlags.Assign)]
-        public IEnumerable<HeartbeatAssetSettings> Assets { get; set; }
-
-        [UsedImplicitly(ImplicitUseKindFlags.Assign)]
-        public TimeSpan TimerPeriod { get; set; }
+        public CashoutSettings Cashout { get; set; }
     }
 }

@@ -36,7 +36,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Modules
 
             builder.RegisterChaosKitty(_settings.ChaosKitty);
 
-            foreach (var assetSettings in _settings.Assets)
+            foreach (var assetSettings in _settings.Cashout.Assets)
             {
                 var periodicalHandlerSettings = new HeartbeatCashoutPeriodicalHandlerSettings
                 {
@@ -49,7 +49,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Modules
 
                 builder.RegisterType<HeartbeatCashoutPeriodicalHandler>()
                     .WithParameter(TypedParameter.From(periodicalHandlerSettings))
-                    .WithParameter(TypedParameter.From(_settings.TimerPeriod))
+                    .WithParameter(TypedParameter.From(_settings.Cashout.TimerPeriod))
                     .As<IStartable>()
                     .SingleInstance();
             }
