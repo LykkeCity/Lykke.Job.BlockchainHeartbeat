@@ -21,6 +21,10 @@ namespace Lykke.Job.BlockchainHeartbeat.AzureRepositories.HeartbeatCashout
 
         public HeartbeatCashoutAggregate.State CurrentState { get; set; }
 
+        public DateTime? LockAcquiredAt { get; set; }
+
+        public DateTime? LockReleasedAt { get; set; }
+
         // ReSharper restore MemberCanBePrivate.Global
 
         #endregion
@@ -60,7 +64,9 @@ namespace Lykke.Job.BlockchainHeartbeat.AzureRepositories.HeartbeatCashout
                 ToAddress = aggregate.ToAddress,
                 Amount = aggregate.Amount,
                 AssetId = aggregate.AssetId,
-                CurrentState = aggregate.CurrentState
+                CurrentState = aggregate.CurrentState,
+                LockReleasedAt = aggregate.LockReleasedAt,
+                LockAcquiredAt = aggregate.LockAcquiredAt
             };
         }
 
@@ -75,7 +81,9 @@ namespace Lykke.Job.BlockchainHeartbeat.AzureRepositories.HeartbeatCashout
                 ToAddress,
                 Amount,
                 AssetId,
-                CurrentState);
+                CurrentState,
+                LockAcquiredAt,
+                LockReleasedAt);
         }
 
         #endregion
