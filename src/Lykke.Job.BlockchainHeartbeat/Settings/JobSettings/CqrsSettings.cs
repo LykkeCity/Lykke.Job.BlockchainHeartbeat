@@ -13,14 +13,5 @@ namespace Lykke.Job.BlockchainHeartbeat.Settings.JobSettings
 
         [UsedImplicitly(ImplicitUseKindFlags.Assign)]
         public TimeSpan RetryDelay { get; set; }
-
-        [UsedImplicitly(ImplicitUseKindFlags.Assign)]
-        public TimeSpan SourceAddressLockingRetryDelay { get; set; }
-
-        [UsedImplicitly(ImplicitUseKindFlags.Assign)]
-        public TimeSpan WaitForTransactionRetryDelay { get; set; }
-
-        [UsedImplicitly(ImplicitUseKindFlags.Assign)]
-        public TimeSpan NotEnoughBalanceRetryDelay { get; set; }
     }
 }

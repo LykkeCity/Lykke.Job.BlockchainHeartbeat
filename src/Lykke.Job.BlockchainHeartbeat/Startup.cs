@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Autofac;
+using Autofac.Core;
 using Autofac.Extensions.DependencyInjection;
 using Common.Log;
 using JetBrains.Annotations;
@@ -84,7 +85,18 @@ namespace Lykke.Job.BlockchainHeartbeat
                 var builder = new ContainerBuilder();
                 builder.Populate(services);
 
-                builder.RegisterModule(new JobModule(appSettings.BlockchainHearbeatJob));
+
+                var modules = new IModule[]
+                {
+                    new JobModule(appSettings.BlockchainHearbeatJob),
+                    new CqrsModule(appSettings.BlockchainHearbeatJob.Cqrs), 
+                    new RepositoriesModule(settingsManager.Nested(p=>p.BlockchainHearbeatJob.Db)) 
+                };
+
+                foreach (var module in modules)
+                {
+                    builder.RegisterModule(module);
+                }
 
                 ApplicationContainer = builder.Build();
 

@@ -16,6 +16,7 @@ using Lykke.Job.BlockchainHeartbeat.Workflow.Sagas;
 using Lykke.Messaging;
 using Lykke.Messaging.Contract;
 using Lykke.Messaging.RabbitMq;
+using Lykke.Messaging.Serialization;
 
 namespace Lykke.Job.BlockchainHeartbeat.Modules
 {
@@ -58,12 +59,6 @@ namespace Lykke.Job.BlockchainHeartbeat.Modules
                 .SingleInstance()
                 .AutoActivate();
 
-            builder.Register(c => new RetryDelayProvider(
-                    _settings.SourceAddressLockingRetryDelay,
-                    _settings.WaitForTransactionRetryDelay,
-                    _settings.NotEnoughBalanceRetryDelay))
-                .AsSelf();
-
             // Sagas
             builder.RegisterType<CashoutFinishRegistrationSaga>();
             builder.RegisterType<HeartBeatCashoutSaga>();
@@ -97,6 +92,10 @@ namespace Lykke.Job.BlockchainHeartbeat.Modules
                 messageEngine,
                 new DefaultEndpointProvider(),
                 true,
+                Register.DefaultEndpointResolver(new RabbitMqConventionEndpointResolver(
+                    "RabbitMq",
+                    SerializationFormat.MessagePack,
+                    environment: "lykke")),
                 Register.BoundedContext(CashoutFinishRegistrationSaga.BoundedContext)
                     .FailedCommandRetryDelay(defaultRetryDelay)
 
@@ -129,6 +128,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Modules
 
                     .ListeningCommands(typeof(StartHeartbeatCashoutCommand))
                     .On(defaultRoute)
+                    .WithLoopback()
                     .WithCommandsHandler<StartHeartbeatCashoutCommandHandler>()
                     .PublishingEvents(typeof(HeartbeatCashoutStartedEvent))
                     .With(eventsRoute)
