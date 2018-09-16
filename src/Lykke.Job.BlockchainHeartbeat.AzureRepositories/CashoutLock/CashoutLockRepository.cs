@@ -41,7 +41,7 @@ namespace Lykke.Job.BlockchainHeartbeat.AzureRepositories.CashoutLock
                     AssetId = assetId
                 });
 
-            return lockEntity.OperationId == operationId;
+            return lockEntity?.OperationId == operationId;
         }
 
         public async Task<bool> ReleaseLockAsync(string assetId, Guid operationId)
