@@ -14,6 +14,7 @@ using Lykke.Job.BlockchainHeartbeat.Core.Services;
 using Lykke.Job.BlockchainHeartbeat.Modules;
 using Lykke.Job.BlockchainHeartbeat.Settings;
 using Lykke.Logs;
+using Lykke.Logs.Loggers.LykkeSlack;
 using Lykke.MonitoringServiceApiCaller;
 using Lykke.SettingsReader;
 using Microsoft.AspNetCore.Builder;
@@ -80,7 +81,14 @@ namespace Lykke.Job.BlockchainHeartbeat
                     settingsManager.ConnectionString(s => s.BlockchainHearbeatJob.Db.LogsConnString),
                     "BlockchainHeartbeat",
                     appSettings.SlackNotifications.AzureQueue.ConnectionString,
-                    appSettings.SlackNotifications.AzureQueue.QueueName);
+                    appSettings.SlackNotifications.AzureQueue.QueueName,
+                    p => {
+                        p.AddAdditionalSlackChannel("CommonBlockChainIntegration");
+                        p.AddAdditionalSlackChannel("CommonBlockChainIntegrationImportantMessages", x =>
+                            {
+                                x.MinLogLevel = Microsoft.Extensions.Logging.LogLevel.Warning;
+                            });
+                    });
 
                 var builder = new ContainerBuilder();
                 builder.Populate(services);
