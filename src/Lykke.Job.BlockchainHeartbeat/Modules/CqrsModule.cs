@@ -5,7 +5,6 @@ using Lykke.Cqrs;
 using Lykke.Cqrs.Configuration;
 using Lykke.Job.BlockchainCashoutProcessor.Contract;
 using Lykke.Job.BlockchainHeartbeat.Settings.JobSettings;
-using Lykke.Job.BlockchainHeartbeat.Workflow;
 using Lykke.Job.BlockchainHeartbeat.Workflow.CommandHandlers.CashoutFinishRegistration;
 using Lykke.Job.BlockchainHeartbeat.Workflow.CommandHandlers.HeartbeatCashout;
 using Lykke.Job.BlockchainHeartbeat.Workflow.Commands.CashoutFinishRegistration;
@@ -69,6 +68,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Modules
             builder.RegisterType<AcquireCashoutLockCommandHandler>();
             builder.RegisterType<ReleaseCashoutLockCommandHandler>();
             builder.RegisterType<StartHeartbeatCashoutCommandHandler>();
+            builder.RegisterType<StartCryptoCashoutCommandHandler>();
 
             builder.Register(CreateEngine)
                 .As<ICqrsEngine>()
@@ -139,6 +139,10 @@ namespace Lykke.Job.BlockchainHeartbeat.Modules
                     .PublishingEvents(typeof(CashoutLockAcquiredEvent))
                     .With(eventsRoute)
 
+                    .ListeningCommands(typeof(StartCryptoCashoutCommand))
+                    .On(defaultRoute)
+                    .WithCommandsHandler<StartCryptoCashoutCommandHandler>()
+
                     .ListeningCommands(typeof(ReleaseCashoutLockCommand))
                     .On(defaultRoute)
                     .WithCommandsHandler<ReleaseCashoutLockCommandHandler>()
@@ -159,8 +163,8 @@ namespace Lykke.Job.BlockchainHeartbeat.Modules
                     .ListeningEvents(typeof(CashoutLockAcquiredEvent))
                     .From(HeartBeatCashoutSaga.BoundedContext)
                     .On(defaultRoute)
-                    .PublishingCommands(typeof(BlockchainCashoutProcessor.Contract.Commands.StartCashoutCommand))
-                    .To(BlockchainCashoutProcessorBoundedContext.Name)
+                    .PublishingCommands(typeof(StartCryptoCashoutCommand))
+                    .To(HeartBeatCashoutSaga.BoundedContext)
                     .With(commandsPipeline)
 
                     .ListeningEvents(

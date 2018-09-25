@@ -23,8 +23,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.CommandHandlers.HeartbeatCashou
                 OperationId = command.OperationId,
                 Amount = command.Amount,
                 AssetId = command.AssetId,
-                ToAddress = command.ToAddress,
-                ClientId = command.ClientId
+                ToAddress = command.ToAddress
             });
 
             _chaosKitty.Meow(command.OperationId);

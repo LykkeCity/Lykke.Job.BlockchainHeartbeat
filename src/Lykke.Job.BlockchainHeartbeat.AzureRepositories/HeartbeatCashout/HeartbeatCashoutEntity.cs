@@ -14,8 +14,8 @@ namespace Lykke.Job.BlockchainHeartbeat.AzureRepositories.HeartbeatCashout
         public DateTime? OperationFinishMoment { get; set; }
 
         public Guid OperationId { get; set; }
-        public Guid ClientId { get; set; }
         public string ToAddress { get; set; }
+        public string ToAddressExtension { get; set; }
         public decimal Amount { get; set; }
         public string AssetId { get; set; }
 
@@ -60,8 +60,8 @@ namespace Lykke.Job.BlockchainHeartbeat.AzureRepositories.HeartbeatCashout
                 StartMoment = aggregate.StartMoment,
                 OperationFinishMoment = aggregate.OperationFinishMoment,
                 OperationId = aggregate.OperationId,
-                ClientId = aggregate.ClientId,
                 ToAddress = aggregate.ToAddress,
+                ToAddressExtension = aggregate.ToAddressExtension,
                 Amount = aggregate.Amount,
                 AssetId = aggregate.AssetId,
                 CurrentState = aggregate.CurrentState,
@@ -77,8 +77,8 @@ namespace Lykke.Job.BlockchainHeartbeat.AzureRepositories.HeartbeatCashout
                 StartMoment,
                 OperationFinishMoment,
                 OperationId,
-                ClientId,
                 ToAddress,
+                ToAddressExtension,
                 Amount,
                 AssetId,
                 CurrentState,

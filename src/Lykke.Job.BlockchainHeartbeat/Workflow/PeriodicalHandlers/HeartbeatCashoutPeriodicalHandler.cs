@@ -83,9 +83,9 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.PeriodicalHandlers
                     {
                         Amount = _settings.Amount,
                         AssetId = _settings.AssetId,
-                        ClientId = _settings.ClientId,
                         OperationId = opId,
-                        ToAddress = _settings.ToAddress
+                        ToAddress = _settings.ToAddress,
+                        ToAddressExtension = _settings.ToAddressExtension
                     }, 
                     HeartBeatCashoutSaga.BoundedContext, 
                     HeartBeatCashoutSaga.BoundedContext);

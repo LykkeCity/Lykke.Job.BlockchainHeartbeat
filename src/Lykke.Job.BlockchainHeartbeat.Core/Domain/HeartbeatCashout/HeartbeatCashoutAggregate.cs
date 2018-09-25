@@ -10,8 +10,8 @@ namespace Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashout
         public DateTime? LockReleasedAt { get; private set; }
         public DateTime? OperationFinishMoment { get; private set; }
         public Guid OperationId { get; }
-        public Guid ClientId { get; }
         public string ToAddress { get; }
+        public string ToAddressExtension { get; }
         public decimal Amount { get; }
         public string AssetId { get; }
 
@@ -21,8 +21,8 @@ namespace Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashout
             DateTime startMoment,
             DateTime? operationFinishMoment,
             Guid operationId,
-            Guid clientId,
             string toAddress,
+            string toAddressExtension,
             decimal amount,
             string assetId,
             State currentState,
@@ -33,7 +33,6 @@ namespace Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashout
             StartMoment = startMoment;
             OperationFinishMoment = operationFinishMoment;
             OperationId = operationId;
-            ClientId = clientId;
             ToAddress = toAddress;
             Amount = amount;
             AssetId = assetId;
@@ -44,8 +43,8 @@ namespace Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashout
 
         public static HeartbeatCashoutAggregate StartNew(
             Guid operationId,
-            Guid clientId,
             string toAddress,
+            string toAddressExtension,
             decimal amount,
             string assetId)
         {
@@ -53,9 +52,9 @@ namespace Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashout
                 startMoment: DateTime.UtcNow,
                 operationFinishMoment: null,
                 operationId: operationId,
-                clientId: clientId,
                 amount: amount, assetId: assetId,
                 toAddress: toAddress,
+                toAddressExtension:toAddressExtension,
                 currentState: State.Started,
                 lockAcquiredAt: null,
                 lockReleasedAt: null);
@@ -66,8 +65,8 @@ namespace Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashout
             DateTime startMoment,
             DateTime? operationFinishMoment,
             Guid operationId,
-            Guid clientId,
             string toAddress,
+            string toAddressExtension,
             decimal amount,
             string assetId,
             State currentState,
@@ -78,9 +77,9 @@ namespace Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashout
                 startMoment: startMoment,
                 operationFinishMoment: operationFinishMoment,
                 operationId: operationId,
-                clientId: clientId,
                 amount: amount, assetId: assetId,
                 toAddress: toAddress,
+                toAddressExtension:toAddressExtension,
                 currentState: currentState,
                 lockAcquiredAt: lockAcquiredAt,
                 lockReleasedAt:lockReleasedAt);

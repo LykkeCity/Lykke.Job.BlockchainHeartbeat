@@ -2,7 +2,6 @@
 using JetBrains.Annotations;
 using Lykke.Common.Chaos;
 using Lykke.Cqrs;
-using Lykke.Job.BlockchainCashoutProcessor.Contract;
 using Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashout;
 using Lykke.Job.BlockchainHeartbeat.Workflow.Commands.HeartbeatCashout;
 using Lykke.Job.BlockchainHeartbeat.Workflow.Events.HeartbeatCashout;
@@ -28,8 +27,8 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
             var aggregate = await _repository.GetOrAddAsync(
                 evt.OperationId,
                 () => HeartbeatCashoutAggregate.StartNew(evt.OperationId, 
-                    evt.ClientId, 
                     evt.ToAddress, 
+                    evt.ToAddressExtension,
                     evt.Amount,
                     evt.AssetId));
 
@@ -57,14 +56,14 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
 
             if (aggregate.OnLockAcquired())
             {
-                sender.SendCommand(new BlockchainCashoutProcessor.Contract.Commands.StartCashoutCommand
+                sender.SendCommand(new StartCryptoCashoutCommand
                 {
                     OperationId = aggregate.OperationId,
                     AssetId = aggregate.AssetId,
                     Amount = aggregate.Amount,
                     ToAddress = aggregate.ToAddress,
-                    ClientId = aggregate.ClientId
-                }, BlockchainCashoutProcessorBoundedContext.Name);
+                    ToAddressExtension = aggregate.ToAddressExtension
+                }, BoundedContext);
 
                 _chaosKitty.Meow(evt.OperationId);
 
