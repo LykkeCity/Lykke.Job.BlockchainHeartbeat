@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
-
-namespace Lykke.Job.BlockchainHeartbeat.Services.WalletApiV2.Contracts.Client
+﻿namespace Lykke.Job.BlockchainHeartbeat.Services.WalletApiV2.Contracts.Client
 {
     internal class AuthRequestModel
     {

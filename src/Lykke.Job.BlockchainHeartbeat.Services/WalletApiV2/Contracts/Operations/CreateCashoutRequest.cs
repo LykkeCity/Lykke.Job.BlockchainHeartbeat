@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Lykke.Job.BlockchainHeartbeat.Services.WalletApiV2.Contracts.Operations
+﻿namespace Lykke.Job.BlockchainHeartbeat.Services.WalletApiV2.Contracts.Operations
 {
     public class CreateCashoutRequest
     {

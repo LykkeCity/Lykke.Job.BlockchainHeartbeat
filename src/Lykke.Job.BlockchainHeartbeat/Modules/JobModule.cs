@@ -2,6 +2,7 @@
 using Lykke.Common.Chaos;
 using Lykke.Job.BlockchainHeartbeat.Core.Services;
 using Lykke.Job.BlockchainHeartbeat.Services;
+using Lykke.Job.BlockchainHeartbeat.Services.WalletApiV2;
 using Lykke.Job.BlockchainHeartbeat.Settings.JobSettings;
 using Lykke.Job.BlockchainHeartbeat.Workflow.CommandHandlers.HeartbeatCashout.Settings;
 using Lykke.Job.BlockchainHeartbeat.Workflow.PeriodicalHandlers;

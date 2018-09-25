@@ -39,6 +39,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashout
             CurrentState = currentState;
             LockAcquiredAt = lockAcquiredAt;
             LockReleasedAt = lockReleasedAt;
+            ToAddressExtension = toAddressExtension;
         }
 
         public static HeartbeatCashoutAggregate StartNew(

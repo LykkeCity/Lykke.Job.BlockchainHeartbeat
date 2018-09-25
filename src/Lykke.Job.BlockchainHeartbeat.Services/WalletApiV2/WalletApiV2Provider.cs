@@ -6,7 +6,7 @@ using Lykke.Job.BlockchainHeartbeat.Core.Services;
 using Lykke.Job.BlockchainHeartbeat.Services.WalletApiV2.Contracts.Client;
 using Lykke.Job.BlockchainHeartbeat.Services.WalletApiV2.Contracts.Operations;
 
-namespace Lykke.Job.BlockchainHeartbeat.Services
+namespace Lykke.Job.BlockchainHeartbeat.Services.WalletApiV2
 {
     public class WalletApiV2Provider: IWalletApiV2Provider
     {
