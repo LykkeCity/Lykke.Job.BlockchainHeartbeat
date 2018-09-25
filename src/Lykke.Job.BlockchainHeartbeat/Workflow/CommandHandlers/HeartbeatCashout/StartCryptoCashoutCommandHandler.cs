@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Lykke.Common.Chaos;
 using Lykke.Cqrs;
@@ -46,8 +45,6 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.CommandHandlers.HeartbeatCashou
                     command.Amount,
                     command.ToAddress,
                     command.ToAddressExtension);
-
-
             }
             finally
             {
