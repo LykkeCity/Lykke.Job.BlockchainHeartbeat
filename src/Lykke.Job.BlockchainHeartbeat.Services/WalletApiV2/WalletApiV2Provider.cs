@@ -40,7 +40,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Services
         {
             await _baseUrl.AppendPathSegment("/api/operations/cashout/crypto")
                 .SetQueryParam("id", operationId)
-                .WithHeader("Authorization", $"Bearer: {accessToken}")
+                .WithHeader("Authorization", $"Bearer {accessToken}")
                 .PostJsonAsync(new CreateCashoutRequest
                 {
                     AssetId = assetId,

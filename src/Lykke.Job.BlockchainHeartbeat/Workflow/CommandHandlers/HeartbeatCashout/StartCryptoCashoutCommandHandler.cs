@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Lykke.Common.Chaos;
 using Lykke.Cqrs;
 using Lykke.Job.BlockchainHeartbeat.Core.Services;
@@ -12,6 +14,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.CommandHandlers.HeartbeatCashou
         private readonly CryptoCashoutUserSettings _cashoutUserSettings;
         private readonly IChaosKitty _chaosKitty;
         private readonly IWalletApiV2Provider _walletApiProvider;
+        private readonly SemaphoreSlim _semaphoreSlim;
 
         public StartCryptoCashoutCommandHandler(CryptoCashoutUserSettings cashoutUserSettings, 
             IChaosKitty chaosKitty,
@@ -20,24 +23,37 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.CommandHandlers.HeartbeatCashou
             _cashoutUserSettings = cashoutUserSettings;
             _chaosKitty = chaosKitty;
             _walletApiProvider = walletApiProvider;
+            _semaphoreSlim = new SemaphoreSlim(1);
         }
 
         public async Task<CommandHandlingResult> Handle(StartCryptoCashoutCommand command,
             IEventPublisher publisher)
         {
-            var authResult = await _walletApiProvider.AuthAsync(_cashoutUserSettings.Email, 
-                _cashoutUserSettings.Password,
-                _cashoutUserSettings.ParthnerId, 
-                _cashoutUserSettings.ClientInfo);
+            try
+            {
+                await _semaphoreSlim.WaitAsync();
 
-            _chaosKitty.Meow(command.OperationId);
+                var authResult = await _walletApiProvider.AuthAsync(_cashoutUserSettings.Email,
+                    _cashoutUserSettings.Password,
+                    _cashoutUserSettings.ParthnerId,
+                    _cashoutUserSettings.ClientInfo);
 
-            await _walletApiProvider.CreateCryptoCashoutAsync(command.OperationId,
-                authResult.accessToken,
-                command.AssetId, 
-                command.Amount,
-                command.ToAddress,
-                command.ToAddressExtension);
+                _chaosKitty.Meow(command.OperationId);
+
+                await _walletApiProvider.CreateCryptoCashoutAsync(command.OperationId,
+                    authResult.accessToken,
+                    command.AssetId,
+                    command.Amount,
+                    command.ToAddress,
+                    command.ToAddressExtension);
+
+
+            }
+            finally
+            {
+                _semaphoreSlim.Release();
+            }
+
 
             return CommandHandlingResult.Ok();
         }
