@@ -22,7 +22,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.CommandHandlers.HeartbeatCashou
             _cashoutUserSettings = cashoutUserSettings;
             _chaosKitty = chaosKitty;
             _walletApiProvider = walletApiProvider;
-            _semaphoreSlim = new SemaphoreSlim(1);
+            _semaphoreSlim = new SemaphoreSlim(1, 1);
         }
 
         public async Task<CommandHandlingResult> Handle(StartCryptoCashoutCommand command,
