@@ -16,7 +16,7 @@ namespace Lykke.Job.BlockchainHeartbeat.AzureRepositories.LastCashoutEventMoment
         {
             var storage = AzureTableStorage<LastCashoutEventMomentEntity>.Create(
                 connectionString,
-                "LastCashoutEventMoments",
+                "HeartbeatLastCashoutEventMoments",
                 logFactory);
 
             return new LastCashoutEventMomentRepository(storage);
