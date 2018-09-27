@@ -147,8 +147,6 @@ namespace Lykke.Job.BlockchainHeartbeat.Modules
                     .ListeningCommands(typeof(ReleaseCashoutLockCommand))
                     .On(defaultRoute)
                     .WithCommandsHandler<ReleaseCashoutLockCommandHandler>()
-                    .PublishingEvents(typeof(CashoutLockReleasedEvent))
-                    .With(eventsRoute)
 
                     .ProcessingOptions(defaultRoute).MultiThreaded(4).QueueCapacity(1024)
                     .ProcessingOptions(eventsRoute).MultiThreaded(4).QueueCapacity(1024),
@@ -177,10 +175,6 @@ namespace Lykke.Job.BlockchainHeartbeat.Modules
                     .PublishingCommands(typeof(ReleaseCashoutLockCommand))
                     .To(HeartBeatCashoutSaga.BoundedContext)
                     .With(commandsPipeline)
-
-                    .ListeningEvents(typeof(CashoutLockReleasedEvent))
-                    .From(HeartBeatCashoutSaga.BoundedContext)
-                    .On(defaultRoute)
                 );
         }
     }

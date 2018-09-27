@@ -121,24 +121,5 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
         }
 
         #endregion
-
-        [UsedImplicitly]
-        private async Task Handle(CashoutLockReleasedEvent evt, ICommandSender sender)
-        {
-            var aggregate = await _repository.TryGetAsync(evt.OperationId);
-
-            if (aggregate == null)
-            {
-                //this is not a heartbeat cashout command
-                return;
-            }
-
-            if (aggregate.OnLockReleased()) 
-            {
-                await _repository.SaveAsync(aggregate);
-
-                _chaosKitty.Meow(evt.OperationId);
-            }
-        }
     }
 }
