@@ -72,7 +72,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.PeriodicalHandlers
             var checkDate = await _lastMomentRepo.GetLastEventMomentAsync(_settings.AssetId) 
                             ?? _startedAt; // run heartbeat with delay if there are no cashout registered
 
-            if (DateTime.UtcNow - checkDate > _settings.MaxCashoutInactivePeriod &&
+            if (DateTime.UtcNow - checkDate > TimeSpan.Zero &&
                 !await _cashoutLockRepository.IsLockedAsync(_settings.AssetId))
             {
                 var opId = Guid.NewGuid();

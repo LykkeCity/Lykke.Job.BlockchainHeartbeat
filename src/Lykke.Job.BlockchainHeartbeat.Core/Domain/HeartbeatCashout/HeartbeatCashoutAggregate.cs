@@ -108,12 +108,12 @@ namespace Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashout
             return false;
         }
 
-        public bool OnFinished(DateTime finisDateTime)
+        public bool OnFinished(DateTime finishMoment)
         {
             if (CurrentState == State.LockAcquired)
             {
                 CurrentState = State.Finished;
-                OperationFinishMoment = finisDateTime;
+                OperationFinishMoment = finishMoment;
                 return true;
             }
 

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Lykke.Common.Chaos;
 using Lykke.Cqrs;
@@ -71,44 +72,40 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
             }
         }
 
+        #region FinishEvents
+
         [UsedImplicitly]
-        private async Task Handle(BlockchainCashoutProcessor.Contract.Events.CashoutCompletedEvent evt, ICommandSender sender)
+        private Task Handle(Service.Operations.Contracts.Events.OperationCompletedEvent evt,
+            ICommandSender sender)
         {
-            var aggregate = await _repository.TryGetAsync(evt.OperationId);
-
-            if (aggregate == null)
-            {
-                //this is not a heartbeat cashout command
-                return;
-            }
-            
-            if (aggregate.OnFinished(evt.FinishMoment))
-            {
-                sender.SendCommand(new ReleaseCashoutLockCommand
-                    {
-                        AssetId = aggregate.AssetId,
-                        OperationId = aggregate.OperationId
-                    }, 
-                    BoundedContext);
-
-                _chaosKitty.Meow(evt.OperationId);
-
-                await _repository.SaveAsync(aggregate);
-            }
+            return HandleOperationFinishEvent(evt.OperationId, sender);
         }
 
         [UsedImplicitly]
-        private async Task Handle(BlockchainCashoutProcessor.Contract.Events.CashoutFailedEvent evt, ICommandSender sender)
+        private Task Handle(Service.Operations.Contracts.Events.OperationCorruptedEvent evt,
+            ICommandSender sender)
         {
-            var aggregate = await _repository.TryGetAsync(evt.OperationId);
+            return HandleOperationFinishEvent(evt.OperationId, sender);
+        }
+
+        [UsedImplicitly]
+        private Task Handle(Service.Operations.Contracts.Events.OperationFailedEvent evt,
+            ICommandSender sender)
+        {
+            return HandleOperationFinishEvent(evt.OperationId, sender);
+        }
+
+        private async Task HandleOperationFinishEvent(Guid operationId, ICommandSender sender)
+        {
+            var aggregate = await _repository.TryGetAsync(operationId);
 
             if (aggregate == null)
             {
-                //this is not a heartbeat cashout command
+                //this is not a heartbeat cashout operation
                 return;
             }
 
-            if (aggregate.OnFinished(evt.FinishMoment))
+            if (aggregate.OnFinished(DateTime.UtcNow))
             {
                 sender.SendCommand(new ReleaseCashoutLockCommand
                     {
@@ -117,11 +114,13 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
                     },
                     BoundedContext);
 
-                _chaosKitty.Meow(evt.OperationId);
+                _chaosKitty.Meow(operationId);
 
                 await _repository.SaveAsync(aggregate);
             }
         }
+
+        #endregion
 
         [UsedImplicitly]
         private async Task Handle(CashoutLockReleasedEvent evt, ICommandSender sender)

@@ -16,6 +16,7 @@ using Lykke.Messaging;
 using Lykke.Messaging.Contract;
 using Lykke.Messaging.RabbitMq;
 using Lykke.Messaging.Serialization;
+using Lykke.Service.Operations.Contracts;
 
 namespace Lykke.Job.BlockchainHeartbeat.Modules
 {
@@ -168,9 +169,10 @@ namespace Lykke.Job.BlockchainHeartbeat.Modules
                     .With(commandsPipeline)
 
                     .ListeningEvents(
-                        typeof(BlockchainCashoutProcessor.Contract.Events.CashoutFailedEvent),
-                        typeof(BlockchainCashoutProcessor.Contract.Events.CashoutCompletedEvent))
-                    .From(BlockchainCashoutProcessorBoundedContext.Name)
+                        typeof(Service.Operations.Contracts.Events.OperationCompletedEvent),
+                        typeof(Service.Operations.Contracts.Events.OperationCorruptedEvent),
+                        typeof(Service.Operations.Contracts.Events.OperationFailedEvent))
+                    .From(OperationsBoundedContext.Name)
                     .On(defaultRoute)
                     .PublishingCommands(typeof(ReleaseCashoutLockCommand))
                     .To(HeartBeatCashoutSaga.BoundedContext)
