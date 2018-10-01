@@ -58,6 +58,15 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
 
             if (aggregate.OnLockAcquired())
             {
+                sender.SendCommand(new RegisterCashoutLastMomentCommand
+                {
+                    AssetId = aggregate.AssetId,
+                    Moment = aggregate.StartMoment,
+                    OperationId = aggregate.OperationId
+                }, BoundedContext);
+
+                _chaosKitty.Meow(evt.OperationId);
+
                 sender.SendCommand(new StartCryptoCashoutCommand
                 {
                     OperationId = aggregate.OperationId,
