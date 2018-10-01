@@ -1,14 +1,14 @@
 ﻿using System;
 using MessagePack;
 
-namespace Lykke.Job.BlockchainHeartbeat.Workflow.Commands.CashoutFinishRegistration
+namespace Lykke.Job.BlockchainHeartbeat.Workflow.Commands.CashoutRegistration
 {
     [MessagePackObject(keyAsPropertyName: true)]
-    public class RegisterFinishMomentCommand
+    public class RegisterCashoutLastMomentCommand
     {
         public Guid OperationId { get; set; }
 
-        public DateTime CashoutFinishedAt { get; set; }
+        public DateTime Moment { get; set; }
 
         public string AssetId { get; set; }
     }

@@ -10,12 +10,10 @@ namespace Lykke.Job.BlockchainHeartbeat.AzureRepositories.CashoutRegistration
         #region Fields
 
         // ReSharper disable MemberCanBePrivate.Global
-        public DateTime StartMoment { get; set; }
+        public DateTime? StartMoment { get; set; }
         public Guid OperationId { get; set; }
         public string AssetId { get; set; }
-        public DateTime CashoutFinishedAt { get; set; }
-
-        public CashoutFinishRegistrationAggregate.State CurrentState { get; set; }
+        public DateTime? FinishMoment { get; set; }
 
         // ReSharper restore MemberCanBePrivate.Global
 
@@ -42,7 +40,7 @@ namespace Lykke.Job.BlockchainHeartbeat.AzureRepositories.CashoutRegistration
 
         #region Conversion
 
-        public static CashoutRegistrationEntity FromDomain(CashoutFinishRegistrationAggregate aggregate)
+        public static CashoutRegistrationEntity FromDomain(CashoutRegistrationAggregate aggregate)
         {
             return new CashoutRegistrationEntity
             {
@@ -52,20 +50,18 @@ namespace Lykke.Job.BlockchainHeartbeat.AzureRepositories.CashoutRegistration
                 StartMoment = aggregate.StartMoment,
                 OperationId = aggregate.OperationId,
                 AssetId = aggregate.AssetId,
-                CurrentState = aggregate.CurrentState,
-                CashoutFinishedAt = aggregate.CashoutFinishedAt
+                FinishMoment = aggregate.FinishMoment
             };
         }
 
-        public CashoutFinishRegistrationAggregate ToDomain()
+        public CashoutRegistrationAggregate ToDomain()
         {
-            return CashoutFinishRegistrationAggregate.Restore(
+            return CashoutRegistrationAggregate.Restore(
                 ETag,
                 StartMoment,
                 OperationId,
                 AssetId,
-                CurrentState,
-                CashoutFinishedAt);
+                FinishMoment);
         }
 
         #endregion

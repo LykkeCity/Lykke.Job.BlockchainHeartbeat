@@ -5,11 +5,10 @@ using Lykke.Cqrs;
 using Lykke.Cqrs.Configuration;
 using Lykke.Job.BlockchainCashoutProcessor.Contract;
 using Lykke.Job.BlockchainHeartbeat.Settings.JobSettings;
-using Lykke.Job.BlockchainHeartbeat.Workflow.CommandHandlers.CashoutFinishRegistration;
+using Lykke.Job.BlockchainHeartbeat.Workflow.CommandHandlers.CashoutRegistration;
 using Lykke.Job.BlockchainHeartbeat.Workflow.CommandHandlers.HeartbeatCashout;
-using Lykke.Job.BlockchainHeartbeat.Workflow.Commands.CashoutFinishRegistration;
+using Lykke.Job.BlockchainHeartbeat.Workflow.Commands.CashoutRegistration;
 using Lykke.Job.BlockchainHeartbeat.Workflow.Commands.HeartbeatCashout;
-using Lykke.Job.BlockchainHeartbeat.Workflow.Events.CashoutFinishRegistration;
 using Lykke.Job.BlockchainHeartbeat.Workflow.Events.HeartbeatCashout;
 using Lykke.Job.BlockchainHeartbeat.Workflow.Sagas;
 using Lykke.Messaging;
@@ -60,12 +59,12 @@ namespace Lykke.Job.BlockchainHeartbeat.Modules
                 .AutoActivate();
 
             // Sagas
-            builder.RegisterType<CashoutFinishRegistrationSaga>();
+            builder.RegisterType<CashoutRegistrationSaga>();
             builder.RegisterType<HeartBeatCashoutSaga>();
 
             // Command handlers
 
-            builder.RegisterType<RegisterFinishMomentCommandHandler>();
+            builder.RegisterType<RegisterCashoutLastMomentCommandHandler>();
             builder.RegisterType<AcquireCashoutLockCommandHandler>();
             builder.RegisterType<ReleaseCashoutLockCommandHandler>();
             builder.RegisterType<StartHeartbeatCashoutCommandHandler>();
@@ -97,32 +96,26 @@ namespace Lykke.Job.BlockchainHeartbeat.Modules
                     "RabbitMq",
                     SerializationFormat.MessagePack,
                     environment: "lykke")),
-                Register.BoundedContext(CashoutFinishRegistrationSaga.BoundedContext)
+                Register.BoundedContext(CashoutRegistrationSaga.BoundedContext)
                     .FailedCommandRetryDelay(defaultRetryDelay)
 
-                    .ListeningCommands(typeof(RegisterFinishMomentCommand))
+                    .ListeningCommands(typeof(RegisterCashoutLastMomentCommand))
                     .On(defaultRoute)
-                    .WithCommandsHandler<RegisterFinishMomentCommandHandler>()
-                    .PublishingEvents(typeof(FinishMomentRegisteredEvent))
-                    .With(eventsRoute)
+                    .WithCommandsHandler<RegisterCashoutLastMomentCommandHandler>()
 
                     .ProcessingOptions(defaultRoute).MultiThreaded(4).QueueCapacity(1024)
                     .ProcessingOptions(eventsRoute).MultiThreaded(4).QueueCapacity(1024),
 
-                Register.Saga<CashoutFinishRegistrationSaga>($"{CashoutFinishRegistrationSaga.BoundedContext}.saga")
+                Register.Saga<CashoutRegistrationSaga>($"{CashoutRegistrationSaga.BoundedContext}.saga")
                     .ListeningEvents(
+                        typeof(BlockchainCashoutProcessor.Contract.Events.CashoutStartedEvent),
                         typeof(BlockchainCashoutProcessor.Contract.Events.CashoutFailedEvent),
                         typeof(BlockchainCashoutProcessor.Contract.Events.CashoutCompletedEvent))
                     .From(BlockchainCashoutProcessorBoundedContext.Name)
                     .On(defaultRoute)
-                    .PublishingCommands(typeof(RegisterFinishMomentCommand))
-                    .To(CashoutFinishRegistrationSaga.BoundedContext)
-                    .With(commandsPipeline)
-
-                    .ListeningEvents(
-                        typeof(FinishMomentRegisteredEvent))
-                    .From(CashoutFinishRegistrationSaga.BoundedContext)
-                    .On(defaultRoute),
+                    .PublishingCommands(typeof(RegisterCashoutLastMomentCommand))
+                    .To(CashoutRegistrationSaga.BoundedContext)
+                    .With(commandsPipeline),
 
                 Register.BoundedContext(HeartBeatCashoutSaga.BoundedContext)
                     .FailedCommandRetryDelay(defaultRetryDelay)
@@ -139,6 +132,10 @@ namespace Lykke.Job.BlockchainHeartbeat.Modules
                     .WithCommandsHandler<AcquireCashoutLockCommandHandler>()
                     .PublishingEvents(typeof(CashoutLockAcquiredEvent))
                     .With(eventsRoute)
+                    
+                    .ListeningCommands(typeof(RegisterCashoutLastMomentCommand))
+                    .On(defaultRoute)
+                    .WithCommandsHandler<RegisterCashoutLastMomentCommandHandler>()
 
                     .ListeningCommands(typeof(StartCryptoCashoutCommand))
                     .On(defaultRoute)

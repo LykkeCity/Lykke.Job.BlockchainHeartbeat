@@ -4,6 +4,7 @@ using JetBrains.Annotations;
 using Lykke.Common.Chaos;
 using Lykke.Cqrs;
 using Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashout;
+using Lykke.Job.BlockchainHeartbeat.Workflow.Commands.CashoutRegistration;
 using Lykke.Job.BlockchainHeartbeat.Workflow.Commands.HeartbeatCashout;
 using Lykke.Job.BlockchainHeartbeat.Workflow.Events.HeartbeatCashout;
 
@@ -57,6 +58,15 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
 
             if (aggregate.OnLockAcquired())
             {
+                sender.SendCommand(new RegisterCashoutLastMomentCommand
+                {
+                    AssetId = aggregate.AssetId,
+                    Moment = aggregate.StartMoment,
+                    OperationId = aggregate.OperationId
+                }, BoundedContext);
+
+                _chaosKitty.Meow(evt.OperationId);
+
                 sender.SendCommand(new StartCryptoCashoutCommand
                 {
                     OperationId = aggregate.OperationId,

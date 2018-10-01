@@ -24,10 +24,10 @@ namespace Lykke.Job.BlockchainHeartbeat.Modules
 
         protected override void Load(ContainerBuilder builder)
         {
-            builder.Register(p => CashoutFinishRegistrationRepository.Create(
+            builder.Register(p => CashoutRegistrationRepository.Create(
                     _dbSettings.Nested(x => x.DataConnString),
                     p.Resolve<ILogFactory>()))
-                .As<ICashoutFinishRegistrationRepository>()
+                .As<ICashoutRegistrationRepository>()
                 .SingleInstance();
 
             builder.Register(p => HeartbeatCashoutRepository.Create(
