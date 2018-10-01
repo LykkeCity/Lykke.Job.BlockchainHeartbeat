@@ -132,10 +132,6 @@ namespace Lykke.Job.BlockchainHeartbeat.Modules
                     .WithCommandsHandler<AcquireCashoutLockCommandHandler>()
                     .PublishingEvents(typeof(CashoutLockAcquiredEvent))
                     .With(eventsRoute)
-                    
-                    .ListeningCommands(typeof(RegisterCashoutLastMomentCommand))
-                    .On(defaultRoute)
-                    .WithCommandsHandler<RegisterCashoutLastMomentCommandHandler>()
 
                     .ListeningCommands(typeof(StartCryptoCashoutCommand))
                     .On(defaultRoute)
