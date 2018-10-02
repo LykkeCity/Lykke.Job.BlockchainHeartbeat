@@ -4,6 +4,7 @@ using Lykke.Common.Chaos;
 using Lykke.Cqrs;
 using Lykke.Job.BlockchainHeartbeat.Core.Domain.LastCashoutEventMoment;
 using Lykke.Job.BlockchainHeartbeat.Workflow.Commands.CashoutRegistration;
+using Lykke.Job.BlockchainHeartbeat.Workflow.Commands.HeartbeatCashout;
 using Lykke.Job.BlockchainHeartbeat.Workflow.Events.HeartbeatCashout;
 
 namespace Lykke.Job.BlockchainHeartbeat.Workflow.CommandHandlers.HeartbeatCashout
@@ -20,7 +21,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.CommandHandlers.HeartbeatCashou
             _lastMomentRepository = lastMomentRepository;
         }
 
-        public async Task<CommandHandlingResult> Handle(RegisterCashoutRegistrationLastMomentCommand momentCommand,
+        public async Task<CommandHandlingResult> Handle(RegisterHeartbeatCashoutLastMomentCommand momentCommand,
             IEventPublisher publisher)
         {
             await _lastMomentRepository.SetLastCashoutEventMomentAsync(momentCommand.AssetId,
