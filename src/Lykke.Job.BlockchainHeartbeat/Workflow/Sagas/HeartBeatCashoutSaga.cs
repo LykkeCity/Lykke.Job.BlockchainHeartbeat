@@ -14,7 +14,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
         private readonly IChaosKitty _chaosKitty;
         private readonly IHeartbeatCashoutRepository _repository;
 
-        public static string BoundedContext = "bcn-integration.cashout-hearbeat";
+        public static string BoundedContext = "bcn-integration.cashout-heartbeat";
 
         public HeartBeatCashoutSaga(IChaosKitty chaosKitty, IHeartbeatCashoutRepository repository)
         {
