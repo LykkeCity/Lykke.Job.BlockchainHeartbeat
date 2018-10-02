@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Lykke.Common.Chaos;
 using Lykke.Cqrs;
 using Lykke.Job.BlockchainHeartbeat.Core.Domain.CashoutLock;
@@ -29,7 +30,18 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.CommandHandlers.HeartbeatCashou
 
                 publisher.PublishEvent(new CashoutLockAcquiredEvent
                 {
-                    OperationId = command.OperationId
+                    OperationId = command.OperationId,
+                    Moment = DateTime.UtcNow
+                });
+            }
+            else
+            {
+                _chaosKitty.Meow(command.OperationId);
+
+                publisher.PublishEvent(new CashoutLockRejectedEvent
+                {
+                    OperationId = command.OperationId,
+                    Moment = DateTime.UtcNow
                 });
             }
 

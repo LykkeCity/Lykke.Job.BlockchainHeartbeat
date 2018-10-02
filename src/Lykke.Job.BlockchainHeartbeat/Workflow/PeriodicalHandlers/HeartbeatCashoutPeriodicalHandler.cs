@@ -10,6 +10,7 @@ using Lykke.Job.BlockchainHeartbeat.Core.Domain.CashoutLock;
 using Lykke.Job.BlockchainHeartbeat.Core.Domain.LastCashoutEventMoment;
 using Lykke.Job.BlockchainHeartbeat.Workflow.Commands.HeartbeatCashout;
 using Lykke.Job.BlockchainHeartbeat.Workflow.Sagas;
+using Lykke.Job.BlockchainHeartbeat.Workflow.Settings;
 
 namespace Lykke.Job.BlockchainHeartbeat.Workflow.PeriodicalHandlers
 {
@@ -85,7 +86,8 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.PeriodicalHandlers
                         AssetId = _settings.AssetId,
                         OperationId = opId,
                         ToAddress = _settings.ToAddress,
-                        ToAddressExtension = _settings.ToAddressExtension
+                        ToAddressExtension = _settings.ToAddressExtension,
+                        MaxCashoutInactivePeriod = _settings.MaxCashoutInactivePeriod
                     }, 
                     HeartBeatCashoutSaga.BoundedContext, 
                     HeartBeatCashoutSaga.BoundedContext);

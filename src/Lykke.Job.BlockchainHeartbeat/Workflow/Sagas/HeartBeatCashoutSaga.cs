@@ -6,6 +6,7 @@ using Lykke.Cqrs;
 using Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashout;
 using Lykke.Job.BlockchainHeartbeat.Workflow.Commands.CashoutRegistration;
 using Lykke.Job.BlockchainHeartbeat.Workflow.Commands.HeartbeatCashout;
+using Lykke.Job.BlockchainHeartbeat.Workflow.Events.CashoutRegistration;
 using Lykke.Job.BlockchainHeartbeat.Workflow.Events.HeartbeatCashout;
 
 namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
@@ -32,7 +33,8 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
                     evt.ToAddress, 
                     evt.ToAddressExtension,
                     evt.Amount,
-                    evt.AssetId));
+                    evt.AssetId,
+                    evt.MaxCashoutInactivePeriod));
 
             _chaosKitty.Meow(evt.OperationId);
 
@@ -51,22 +53,52 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
             }
         }
 
+        #region Cashout Lock Result
+
         [UsedImplicitly]
         private async Task Handle(CashoutLockAcquiredEvent evt, ICommandSender sender)
         {
             var aggregate = await _repository.GetAsync(evt.OperationId);
 
-            if (aggregate.OnLockAcquired())
+            if (aggregate.OnLockAcquired(evt.Moment))
             {
-                sender.SendCommand(new RegisterCashoutLastMomentCommand
+                sender.SendCommand(new CheckCashoutPreconditionsCommand
                 {
+                    OperationId = aggregate.OperationId,
                     AssetId = aggregate.AssetId,
-                    Moment = aggregate.StartMoment,
-                    OperationId = aggregate.OperationId
+                    MaxCashoutInactivePeriod = aggregate.MaxCashoutInactivePeriod
                 }, BoundedContext);
 
                 _chaosKitty.Meow(evt.OperationId);
 
+                await _repository.SaveAsync(aggregate);
+            }
+        }
+
+        [UsedImplicitly]
+        private async Task Handle(CashoutLockRejectedEvent evt, ICommandSender sender)
+        {
+            var aggregate = await _repository.GetAsync(evt.OperationId);
+
+            if (aggregate.OnLockRejected(evt.Moment))
+            {
+                _chaosKitty.Meow(evt.OperationId);
+
+                await _repository.SaveAsync(aggregate);
+            }
+        }
+
+        #endregion
+
+        #region Cashout Precondition Result
+        
+        [UsedImplicitly]
+        private async Task Handle(CashoutPreconditionPassedEvent evt, ICommandSender sender)
+        {
+            var aggregate = await _repository.GetAsync(evt.OperationId);
+
+            if (aggregate.OnPreconditionPassed(evt.Moment))
+            {
                 sender.SendCommand(new StartCryptoCashoutCommand
                 {
                     OperationId = aggregate.OperationId,
@@ -82,7 +114,22 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
             }
         }
 
-        #region FinishEvents
+        [UsedImplicitly]
+        private async Task Handle(CashoutPreconditionRejectedEvent evt, ICommandSender sender)
+        {
+            var aggregate = await _repository.GetAsync(evt.OperationId);
+
+            if (aggregate.OnPreconditionRejected(evt.Moment))
+            {
+                _chaosKitty.Meow(evt.OperationId);
+
+                await _repository.SaveAsync(aggregate);
+            }
+        }
+
+        #endregion
+
+        #region CashoutFinishEvents
 
         [UsedImplicitly]
         private Task Handle(Service.Operations.Contracts.Events.OperationCompletedEvent evt,
@@ -115,14 +162,15 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
                 return;
             }
 
+            //TODO suggest to put timestamp in contract
             if (aggregate.OnFinished(DateTime.UtcNow))
             {
-                sender.SendCommand(new ReleaseCashoutLockCommand
-                    {
-                        AssetId = aggregate.AssetId,
-                        OperationId = aggregate.OperationId
-                    },
-                    BoundedContext);
+                sender.SendCommand(new RegisterCashoutLastMomentCommand
+                {
+                    AssetId = aggregate.AssetId,
+                    Moment = aggregate.StartMoment,
+                    OperationId = aggregate.OperationId
+                }, BoundedContext);
 
                 _chaosKitty.Meow(operationId);
 
@@ -131,5 +179,25 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
         }
 
         #endregion
+
+        [UsedImplicitly]
+        private async Task Handle(CashoutLastMomentRegisteredEvent evt, ICommandSender sender)
+        {
+            var aggregate = await _repository.GetAsync(evt.OperationId);
+
+            if (aggregate.OnLastMomentRegistered(evt.Moment))
+            {
+                sender.SendCommand(new ReleaseCashoutLockCommand
+                    {
+                        AssetId = aggregate.AssetId,
+                        OperationId = aggregate.OperationId
+                    },
+                    BoundedContext);
+
+                _chaosKitty.Meow(evt.OperationId);
+
+                await _repository.SaveAsync(aggregate);
+            }
+        }
     }
 }

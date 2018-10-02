@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 using Lykke.Common.Chaos;
 using Lykke.Cqrs;
 using Lykke.Job.BlockchainHeartbeat.Core.Services;
-using Lykke.Job.BlockchainHeartbeat.Workflow.CommandHandlers.HeartbeatCashout.Settings;
 using Lykke.Job.BlockchainHeartbeat.Workflow.Commands.HeartbeatCashout;
+using Lykke.Job.BlockchainHeartbeat.Workflow.Settings;
 
 namespace Lykke.Job.BlockchainHeartbeat.Workflow.CommandHandlers.HeartbeatCashout
 {

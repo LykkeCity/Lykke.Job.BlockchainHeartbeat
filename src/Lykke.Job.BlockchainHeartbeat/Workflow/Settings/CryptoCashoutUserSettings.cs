@@ -1,4 +1,4 @@
-﻿namespace Lykke.Job.BlockchainHeartbeat.Workflow.CommandHandlers.HeartbeatCashout.Settings
+﻿namespace Lykke.Job.BlockchainHeartbeat.Workflow.Settings
 {
     public class CryptoCashoutUserSettings
     {

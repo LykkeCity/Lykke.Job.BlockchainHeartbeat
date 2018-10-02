@@ -4,7 +4,7 @@ using MessagePack;
 namespace Lykke.Job.BlockchainHeartbeat.Workflow.Events.HeartbeatCashout
 {
     [MessagePackObject(keyAsPropertyName: true)]
-    public class CashoutLockAcquiredEvent
+    public class CashoutPreconditionPassedEvent
     {
         public Guid OperationId { get; set; }
 

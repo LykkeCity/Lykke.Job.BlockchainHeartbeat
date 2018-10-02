@@ -1,10 +1,10 @@
 ﻿using System;
 using MessagePack;
 
-namespace Lykke.Job.BlockchainHeartbeat.Workflow.Events.HeartbeatCashout
+namespace Lykke.Job.BlockchainHeartbeat.Workflow.Events.CashoutRegistration
 {
     [MessagePackObject(keyAsPropertyName: true)]
-    public class CashoutLockAcquiredEvent
+    public class CashoutLastMomentRegisteredEvent
     {
         public Guid OperationId { get; set; }
 

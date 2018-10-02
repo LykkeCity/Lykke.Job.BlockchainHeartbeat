@@ -11,5 +11,6 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Events.HeartbeatCashout
         public string ToAddressExtension { get; set; }
         public decimal Amount { get; set; }
         public string AssetId { get; set; }
+        public TimeSpan MaxCashoutInactivePeriod { get; set; }
     }
 }

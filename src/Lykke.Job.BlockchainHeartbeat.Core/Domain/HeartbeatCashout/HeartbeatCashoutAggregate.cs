@@ -7,12 +7,16 @@ namespace Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashout
         public string Version { get; }
         public DateTime StartMoment { get; }
         public DateTime? LockAcquiredAt { get; private set; }
+        public DateTime? LockRejectedAt { get; private set; }
+        public DateTime? LastMomentRegisteredAt { get; private set; }
         public DateTime? OperationFinishMoment { get; private set; }
         public Guid OperationId { get; }
         public string ToAddress { get; }
         public string ToAddressExtension { get; }
         public decimal Amount { get; }
         public string AssetId { get; }
+
+        public TimeSpan MaxCashoutInactivePeriod { get; }
 
         public State CurrentState { get; private set; }
 
@@ -25,7 +29,10 @@ namespace Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashout
             decimal amount,
             string assetId,
             State currentState,
-            DateTime? lockAcquiredAt)
+            DateTime? lockAcquiredAt,
+            DateTime? lockRejectedAt,
+            DateTime? lastMomentRegisteredAt,
+            TimeSpan maxCashoutInactivePeriod)
         {
             Version = version;
             StartMoment = startMoment;
@@ -37,6 +44,9 @@ namespace Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashout
             CurrentState = currentState;
             LockAcquiredAt = lockAcquiredAt;
             ToAddressExtension = toAddressExtension;
+            LockRejectedAt = lockRejectedAt;
+            LastMomentRegisteredAt = lastMomentRegisteredAt;
+            MaxCashoutInactivePeriod = maxCashoutInactivePeriod;
         }
 
         public static HeartbeatCashoutAggregate StartNew(
@@ -44,7 +54,8 @@ namespace Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashout
             string toAddress,
             string toAddressExtension,
             decimal amount,
-            string assetId)
+            string assetId,
+            TimeSpan maxCashoutInactivePeriod)
         {
             return new HeartbeatCashoutAggregate(version: null,
                 startMoment: DateTime.UtcNow,
@@ -54,7 +65,10 @@ namespace Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashout
                 toAddress: toAddress,
                 toAddressExtension:toAddressExtension,
                 currentState: State.Started,
-                lockAcquiredAt: null);
+                lockAcquiredAt: null,
+                lockRejectedAt: null,
+                lastMomentRegisteredAt: null,
+                maxCashoutInactivePeriod: maxCashoutInactivePeriod);
         }
 
         public static HeartbeatCashoutAggregate Restore(
@@ -67,7 +81,10 @@ namespace Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashout
             decimal amount,
             string assetId,
             State currentState,
-            DateTime? lockAcquiredAt)
+            DateTime? lockAcquiredAt,
+            DateTime? lockRejectedAt,
+            DateTime? lastMomentRegisteredAt,
+            TimeSpan maxCashoutInactivePeriod)
         {
             return new HeartbeatCashoutAggregate(version: version,
                 startMoment: startMoment,
@@ -77,7 +94,10 @@ namespace Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashout
                 toAddress: toAddress,
                 toAddressExtension:toAddressExtension,
                 currentState: currentState,
-                lockAcquiredAt: lockAcquiredAt);
+                lockAcquiredAt: lockAcquiredAt,
+                lockRejectedAt: lockRejectedAt,
+                lastMomentRegisteredAt: lastMomentRegisteredAt,
+                maxCashoutInactivePeriod: maxCashoutInactivePeriod);
         }
         public bool OnStarted()
         {
@@ -89,12 +109,11 @@ namespace Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashout
             return false;
         }
         
-        public bool OnLockAcquired()
+        public bool OnLockAcquired(DateTime moment)
         {
-            if (CurrentState == State.Started)
+            if (SwitchState(expectedState: State.Started, nextState: State.LockAcquired))
             {
-                LockAcquiredAt = DateTime.UtcNow;
-                CurrentState = State.LockAcquired;
+                LockAcquiredAt = moment;
 
                 return true;
             }
@@ -102,12 +121,57 @@ namespace Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashout
             return false;
         }
 
-        public bool OnFinished(DateTime finishMoment)
+        public bool OnLockRejected(DateTime moment)
         {
-            if (CurrentState == State.LockAcquired)
+            if (SwitchState(expectedState: State.Started, nextState: State.LockRejected))
             {
-                CurrentState = State.Finished;
-                OperationFinishMoment = finishMoment;
+                LockRejectedAt = moment;
+
+                return true;
+            }
+
+            return false;
+        }
+        
+        public bool OnFinished(DateTime moment)
+        {
+            if (SwitchState(expectedState: State.LockAcquired, nextState: State.Finished))
+            {
+                OperationFinishMoment = moment;
+
+                return true;
+            }
+
+            return false;
+        }
+        
+        public bool OnLastMomentRegistered(DateTime moment)
+        {
+            if (SwitchState(expectedState: State.Finished, nextState: State.LastMomentRegistered))
+            {
+                LastMomentRegisteredAt = moment;
+
+                return true;
+            }
+
+            return false;
+        }
+
+
+        public bool OnPreconditionPassed(DateTime moment)
+        {
+            if (SwitchState(expectedState: State.LockAcquired, nextState: State.PreconditionPassed))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool OnPreconditionRejected(DateTime moment)
+        {
+            if (SwitchState(expectedState: State.LockAcquired, nextState: State.PreconditionRejected))
+            {
                 return true;
             }
 
@@ -118,7 +182,30 @@ namespace Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashout
         {
             Started,
             LockAcquired,
-            Finished
+            LockRejected,
+            PreconditionPassed,
+            PreconditionRejected,
+            Finished,
+            LastMomentRegistered,
+        }
+
+        private bool SwitchState(State expectedState, State nextState)
+        {
+            if (CurrentState < expectedState)
+            {
+                // Throws to retry and wait until aggregate will be in the required state
+                throw new InvalidAggregateStateException(CurrentState, expectedState, nextState);
+            }
+
+            if (CurrentState > expectedState)
+            {
+                // Aggregate already in the next state, so this event can be just ignored
+                return false;
+            }
+
+            CurrentState = nextState;
+
+            return true;
         }
     }
 }
