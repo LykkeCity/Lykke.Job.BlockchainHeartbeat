@@ -7,7 +7,7 @@ using Lykke.SettingsReader.Attributes;
 namespace Lykke.Job.BlockchainHeartbeat.Settings.JobSettings
 {
     [UsedImplicitly]
-    public class BlockchainHearbeatSettings
+    public class BlockchainHeartbeatSettings
     {
         [UsedImplicitly(ImplicitUseKindFlags.Assign)]
         public DbSettings Db { get; set; }

@@ -78,7 +78,7 @@ namespace Lykke.Job.BlockchainHeartbeat
                     _monitoringServiceUrl = appSettings.MonitoringServiceClient.MonitoringServiceUrl;
 
                 services.AddLykkeLogging(
-                    settingsManager.ConnectionString(s => s.BlockchainHearbeatJob.Db.LogsConnString),
+                    settingsManager.ConnectionString(s => s.BlockchainHeartbeatJob.Db.LogsConnString),
                     "BlockchainHeartbeat",
                     appSettings.SlackNotifications.AzureQueue.ConnectionString,
                     appSettings.SlackNotifications.AzureQueue.QueueName,
@@ -96,9 +96,9 @@ namespace Lykke.Job.BlockchainHeartbeat
 
                 var modules = new IModule[]
                 {
-                    new JobModule(appSettings.BlockchainHearbeatJob),
-                    new CqrsModule(appSettings.BlockchainHearbeatJob.Cqrs), 
-                    new RepositoriesModule(settingsManager.Nested(p=>p.BlockchainHearbeatJob.Db)) 
+                    new JobModule(appSettings.BlockchainHeartbeatJob),
+                    new CqrsModule(appSettings.BlockchainHeartbeatJob.Cqrs), 
+                    new RepositoriesModule(settingsManager.Nested(p=>p.BlockchainHeartbeatJob.Db)) 
                 };
 
                 foreach (var module in modules)

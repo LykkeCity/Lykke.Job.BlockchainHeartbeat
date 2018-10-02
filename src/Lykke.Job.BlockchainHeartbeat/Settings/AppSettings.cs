@@ -9,7 +9,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Settings
     public class AppSettings
     {
         [UsedImplicitly(ImplicitUseKindFlags.Assign)]
-        public BlockchainHearbeatSettings BlockchainHearbeatJob { get; set; }
+        public BlockchainHeartbeatSettings BlockchainHeartbeatJob { get; set; }
 
         [UsedImplicitly(ImplicitUseKindFlags.Assign)]
         public SlackNotificationsSettings SlackNotifications { get; set; }

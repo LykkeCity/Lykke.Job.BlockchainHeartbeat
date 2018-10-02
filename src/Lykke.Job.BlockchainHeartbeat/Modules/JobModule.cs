@@ -11,9 +11,9 @@ namespace Lykke.Job.BlockchainHeartbeat.Modules
 {
     public class JobModule : Module
     {
-        private readonly BlockchainHearbeatSettings _settings;
+        private readonly BlockchainHeartbeatSettings _settings;
 
-        public JobModule(BlockchainHearbeatSettings settings)
+        public JobModule(BlockchainHeartbeatSettings settings)
         {
             _settings = settings;
         }
