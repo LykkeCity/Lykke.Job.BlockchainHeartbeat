@@ -4,7 +4,7 @@ using MessagePack;
 namespace Lykke.Job.BlockchainHeartbeat.Workflow.Commands.CashoutRegistration
 {
     [MessagePackObject(keyAsPropertyName: true)]
-    public class RegisterCashoutLastMomentCommand
+    public class RegisterCashoutRegistrationLastMomentCommand
     {
         public Guid OperationId { get; set; }
 

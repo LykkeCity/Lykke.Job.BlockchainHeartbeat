@@ -32,7 +32,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
 
             aggregate.OnStarted(DateTime.UtcNow);
 
-            sender.SendCommand(new RegisterCashoutLastMomentCommand
+            sender.SendCommand(new RegisterCashoutRegistrationLastMomentCommand
                 {
                     AssetId = aggregate.AssetId,
                     Moment = aggregate.StartMoment ?? throw new ArgumentNullException(nameof(aggregate.StartMoment)),
@@ -55,7 +55,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
 
             aggregate.OnFinished(evt.FinishMoment);
 
-            sender.SendCommand(new RegisterCashoutLastMomentCommand
+            sender.SendCommand(new RegisterCashoutRegistrationLastMomentCommand
                 {
                     AssetId = aggregate.AssetId,
                     Moment = aggregate.FinishMoment ?? throw new ArgumentNullException(nameof(aggregate.FinishMoment)),
@@ -78,7 +78,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
 
             aggregate.OnFinished(evt.FinishMoment);
 
-            sender.SendCommand(new RegisterCashoutLastMomentCommand
+            sender.SendCommand(new RegisterCashoutRegistrationLastMomentCommand
                 {
                     AssetId = aggregate.AssetId,
                     Moment = aggregate.FinishMoment ?? throw new ArgumentNullException(nameof(aggregate.FinishMoment)),

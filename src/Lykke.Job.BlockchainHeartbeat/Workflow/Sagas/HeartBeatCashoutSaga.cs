@@ -4,9 +4,7 @@ using JetBrains.Annotations;
 using Lykke.Common.Chaos;
 using Lykke.Cqrs;
 using Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashout;
-using Lykke.Job.BlockchainHeartbeat.Workflow.Commands.CashoutRegistration;
 using Lykke.Job.BlockchainHeartbeat.Workflow.Commands.HeartbeatCashout;
-using Lykke.Job.BlockchainHeartbeat.Workflow.Events.CashoutRegistration;
 using Lykke.Job.BlockchainHeartbeat.Workflow.Events.HeartbeatCashout;
 
 namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
@@ -165,7 +163,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
             //TODO suggest to put timestamp in contract
             if (aggregate.OnFinished(DateTime.UtcNow))
             {
-                sender.SendCommand(new RegisterCashoutLastMomentCommand
+                sender.SendCommand(new RegisterHeartbeatCashoutLastMomentCommand
                 {
                     AssetId = aggregate.AssetId,
                     Moment = aggregate.StartMoment,
