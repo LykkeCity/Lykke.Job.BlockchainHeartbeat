@@ -6,7 +6,7 @@
 
         public string Password { get; set; }
 
-        public string ParthnerId { get; set; }
+        public string PartnerId { get; set; }
 
         public string ClientInfo { get; set; }
     }

@@ -38,7 +38,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Modules
             {
                 ClientInfo = _settings.Cashout.User.ClientInfo,
                 Email = _settings.Cashout.User.Email,
-                ParthnerId = _settings.Cashout.User.ParthnerId,
+                PartnerId = _settings.Cashout.User.PartnerId,
                 Password = _settings.Cashout.User.Password
             }).SingleInstance();
 

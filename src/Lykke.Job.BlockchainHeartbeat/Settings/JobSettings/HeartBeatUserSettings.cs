@@ -12,7 +12,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Settings.JobSettings
         public string Password { get; set; }
 
         [UsedImplicitly(ImplicitUseKindFlags.Assign)]
-        public string ParthnerId { get; set; }
+        public string PartnerId { get; set; }
 
         [Optional]
         [UsedImplicitly(ImplicitUseKindFlags.Assign)]

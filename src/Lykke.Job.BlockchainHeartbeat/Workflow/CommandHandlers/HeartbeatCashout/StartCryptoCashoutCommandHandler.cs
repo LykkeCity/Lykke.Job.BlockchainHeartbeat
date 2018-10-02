@@ -34,7 +34,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.CommandHandlers.HeartbeatCashou
 
                 var authResult = await _walletApiProvider.AuthAsync(_cashoutUserSettings.Email,
                     _cashoutUserSettings.Password,
-                    _cashoutUserSettings.ParthnerId,
+                    _cashoutUserSettings.PartnerId,
                     _cashoutUserSettings.ClientInfo);
 
                 _chaosKitty.Meow(command.OperationId);
