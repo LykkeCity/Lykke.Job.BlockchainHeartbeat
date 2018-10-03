@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Common.Log;
 using JetBrains.Annotations;
 using Lykke.Common.Chaos;
-using Lykke.Common.Log;
 using Lykke.Cqrs;
 using Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashout;
 using Lykke.Job.BlockchainHeartbeat.Workflow.Commands.HeartbeatCashout;
@@ -15,18 +13,13 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
     {
         private readonly IChaosKitty _chaosKitty;
         private readonly IHeartbeatCashoutRepository _repository;
-        private readonly ILog _log
-            ;
 
         public static string BoundedContext = "bcn-integration.cashout-heartbeat";
 
-        public HeartBeatCashoutSaga(IChaosKitty chaosKitty,
-            IHeartbeatCashoutRepository repository, 
-            ILogFactory logFactory)
+        public HeartBeatCashoutSaga(IChaosKitty chaosKitty, IHeartbeatCashoutRepository repository)
         {
             _chaosKitty = chaosKitty;
             _repository = repository;
-            _log = logFactory.CreateLog(this);
         }
 
         [UsedImplicitly]
@@ -91,9 +84,6 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
 
                 await _repository.SaveAsync(aggregate);
             }
-
-            _log.Warning("Temporaly logging ", context: aggregate, process:nameof(CashoutLockRejectedEvent));
-            
         }
 
         #endregion
@@ -184,8 +174,6 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
 
                 await _repository.SaveAsync(aggregate);
             }
-
-            _log.Warning("Temporaly logging ", context: aggregate, process: nameof(CashoutLockRejectedEvent));
         }
 
         #endregion
