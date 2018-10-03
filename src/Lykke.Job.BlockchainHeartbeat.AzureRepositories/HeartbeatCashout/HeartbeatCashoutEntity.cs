@@ -74,7 +74,9 @@ namespace Lykke.Job.BlockchainHeartbeat.AzureRepositories.HeartbeatCashout
                 LockAcquiredAt = aggregate.LockAcquiredAt,
                 LockRejectedAt = aggregate.LockRejectedAt,
                 LastMomentRegisteredAt = aggregate.LastMomentRegisteredAt,
-                MaxCashoutInactivePeriod = aggregate.MaxCashoutInactivePeriod
+                MaxCashoutInactivePeriod = aggregate.MaxCashoutInactivePeriod,
+                PreconditionRejectedAt = aggregate.PreconditionRejectedAt,
+                PreconditionPassedAt = aggregate.PreconditionPassedAt
             };
         }
 
