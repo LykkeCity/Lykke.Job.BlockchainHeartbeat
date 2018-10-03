@@ -135,7 +135,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashout
         
         public bool OnFinished(DateTime moment)
         {
-            if (SwitchState(expectedState: State.LockAcquired, nextState: State.Finished))
+            if (SwitchState(expectedState: State.PreconditionPassed, nextState: State.Finished))
             {
                 OperationFinishMoment = moment;
 
