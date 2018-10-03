@@ -21,9 +21,5 @@ namespace Lykke.Job.BlockchainHeartbeat.Settings.JobSettings
 
         [UsedImplicitly(ImplicitUseKindFlags.Assign)]
         public TimeSpan MaxCashoutInactivePeriod { get; set; }
-
-        [UsedImplicitly(ImplicitUseKindFlags.Assign)]
-        [Optional]
-        public bool IsDisabled { get; set; } = false;
     }
 }

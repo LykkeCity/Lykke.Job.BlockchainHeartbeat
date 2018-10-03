@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using Autofac;
+﻿using Autofac;
 using Lykke.Common.Chaos;
 using Lykke.Job.BlockchainHeartbeat.Core.Services;
 using Lykke.Job.BlockchainHeartbeat.Services;
@@ -45,7 +44,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Modules
 
             builder.RegisterChaosKitty(_settings.ChaosKitty);
 
-            foreach (var assetSettings in _settings.Cashout.Assets.Where(p => !p.IsDisabled))
+            foreach (var assetSettings in _settings.Cashout.Assets)
             {
                 var periodicalHandlerSettings = new HeartbeatCashoutPeriodicalHandlerSettings
                 {
