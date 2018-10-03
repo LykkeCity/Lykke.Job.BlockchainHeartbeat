@@ -132,7 +132,27 @@ namespace Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashout
 
             return false;
         }
-        
+
+        public bool OnPreconditionPassed(DateTime moment)
+        {
+            if (SwitchState(expectedState: State.LockAcquired, nextState: State.PreconditionPassed))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool OnPreconditionRejected(DateTime moment)
+        {
+            if (SwitchState(expectedState: State.LockAcquired, nextState: State.PreconditionRejected))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         public bool OnFinished(DateTime moment)
         {
             if (SwitchState(expectedState: State.PreconditionPassed, nextState: State.Finished))
@@ -151,27 +171,6 @@ namespace Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashout
             {
                 LastMomentRegisteredAt = moment;
 
-                return true;
-            }
-
-            return false;
-        }
-
-
-        public bool OnPreconditionPassed(DateTime moment)
-        {
-            if (SwitchState(expectedState: State.LockAcquired, nextState: State.PreconditionPassed))
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        public bool OnPreconditionRejected(DateTime moment)
-        {
-            if (SwitchState(expectedState: State.LockAcquired, nextState: State.PreconditionRejected))
-            {
                 return true;
             }
 
