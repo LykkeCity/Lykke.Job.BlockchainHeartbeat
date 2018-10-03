@@ -25,6 +25,10 @@ namespace Lykke.Job.BlockchainHeartbeat.AzureRepositories.HeartbeatCashout
         public DateTime? LockRejectedAt { get; set; }
         public DateTime? LastMomentRegisteredAt { get; set; }
 
+
+        public DateTime? PreconditionPassedAt { get; set; }
+        public DateTime? PreconditionRejectedAt { get; set; }
+
         public TimeSpan MaxCashoutInactivePeriod { get; set; }
 
         // ReSharper restore MemberCanBePrivate.Global
@@ -89,7 +93,9 @@ namespace Lykke.Job.BlockchainHeartbeat.AzureRepositories.HeartbeatCashout
                 LockAcquiredAt,
                 LockRejectedAt,
                 LastMomentRegisteredAt,
-                MaxCashoutInactivePeriod);
+                MaxCashoutInactivePeriod,
+                PreconditionPassedAt,
+                PreconditionRejectedAt);
         }
 
         #endregion
