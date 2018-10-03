@@ -80,13 +80,6 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
 
             if (aggregate.OnLockRejected(evt.Moment))
             {
-                sender.SendCommand(new ReleaseCashoutLockCommand
-                    {
-                        AssetId = aggregate.AssetId,
-                        OperationId = aggregate.OperationId
-                    },
-                    BoundedContext);
-                
                 _chaosKitty.Meow(evt.OperationId);
 
                 await _repository.SaveAsync(aggregate);
@@ -126,6 +119,13 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
 
             if (aggregate.OnPreconditionRejected(evt.Moment))
             {
+                sender.SendCommand(new ReleaseCashoutLockCommand
+                    {
+                        AssetId = aggregate.AssetId,
+                        OperationId = aggregate.OperationId
+                    },
+                    BoundedContext);
+
                 _chaosKitty.Meow(evt.OperationId);
 
                 await _repository.SaveAsync(aggregate);

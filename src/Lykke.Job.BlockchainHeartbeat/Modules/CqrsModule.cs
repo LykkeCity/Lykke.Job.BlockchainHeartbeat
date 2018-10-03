@@ -177,9 +177,6 @@ namespace Lykke.Job.BlockchainHeartbeat.Modules
                     .ListeningEvents(typeof(CashoutLockRejectedEvent))
                     .From(HeartBeatCashoutSaga.BoundedContext)
                     .On(defaultRoute)
-                    .PublishingCommands(typeof(ReleaseCashoutLockCommand))
-                    .To(HeartBeatCashoutSaga.BoundedContext)
-                    .With(commandsPipeline)
 
                     .ListeningEvents(typeof(CashoutPreconditionPassedEvent))
                     .From(HeartBeatCashoutSaga.BoundedContext)
@@ -191,6 +188,9 @@ namespace Lykke.Job.BlockchainHeartbeat.Modules
                     .ListeningEvents(typeof(CashoutPreconditionRejectedEvent))
                     .From(HeartBeatCashoutSaga.BoundedContext)
                     .On(defaultRoute)
+                    .PublishingCommands(typeof(ReleaseCashoutLockCommand))
+                    .To(HeartBeatCashoutSaga.BoundedContext)
+                    .With(commandsPipeline)
 
                     .ListeningEvents(
                         typeof(Service.Operations.Contracts.Events.OperationCompletedEvent),
