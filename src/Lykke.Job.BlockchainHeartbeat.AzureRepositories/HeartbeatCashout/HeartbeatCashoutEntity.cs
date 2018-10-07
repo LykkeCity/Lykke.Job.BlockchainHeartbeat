@@ -143,7 +143,7 @@ namespace Lykke.Job.BlockchainHeartbeat.AzureRepositories.HeartbeatCashout
                 amount: Amount, assetId: AssetId,
                 toAddress: ToAddress,
                 toAddressExtension: ToAddressExtension,
-                currentState: HeartbeatCashoutAggregate.State.Started,
+                currentState: CurrentState,
                 lockAcquiredAt: LockAcquiredAt,
                 lockRejectedAt: LockRejectedAt,
                 lastMomentRegisteredAt: LastMomentRegisteredAt,

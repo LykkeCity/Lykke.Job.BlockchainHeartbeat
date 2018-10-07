@@ -18,7 +18,7 @@ namespace Lykke.Job.BlockchainHeartbeat.AzureRepositories.HeartbeatCashout
         {
             var storage = AzureTableStorage<HeartbeatCashoutEntity>.Create(
                 connectionString,
-                "HearbeatCashouts",
+                "HeartbeatCashouts",
                 log);
 
             return new HeartbeatCashoutRepository(storage);

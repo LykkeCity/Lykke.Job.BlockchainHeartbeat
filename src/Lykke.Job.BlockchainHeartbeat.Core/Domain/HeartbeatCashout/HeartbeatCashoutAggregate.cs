@@ -142,13 +142,13 @@ namespace Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashout
             decimal clientBalance)
         {
             return new HeartbeatCashoutAggregate(version: version,
-                startMoment: DateTime.UtcNow,
+                startMoment: startMoment,
                 operationFinishMoment: operationFinishMoment,
                 operationId: operationId,
                 amount: amount, assetId: assetId,
                 toAddress: toAddress,
                 toAddressExtension:toAddressExtension,
-                currentState: State.Started,
+                currentState: currentState,
                 lockAcquiredAt: lockAcquiredAt,
                 lockRejectedAt: lockRejectedAt,
                 lastMomentRegisteredAt: lastMomentRegisteredAt,

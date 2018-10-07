@@ -186,7 +186,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
                     Client = new ClientCashoutModel
                     {
                         Id = aggregate.ClientId,
-                        Balance = decimal.MaxValue,
+                        Balance = aggregate.ClientBalance,
                         CashOutBlocked = false,
                         KycStatus = KycStatus.Ok.ToString(),
                         ConfirmationType = "google"
@@ -194,7 +194,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
                     GlobalSettings = new GlobalSettingsCashoutModel
                     {
                         TwoFactorEnabled = false,
-                        CashOutBlocked = false, // TODO
+                        CashOutBlocked = false, 
 
                         FeeSettings = new FeeSettingsCashoutModel
                         {

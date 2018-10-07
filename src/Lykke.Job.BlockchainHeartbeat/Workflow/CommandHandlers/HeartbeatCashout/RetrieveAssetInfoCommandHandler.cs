@@ -42,7 +42,8 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.CommandHandlers.HeartbeatCashou
                 CashoutMinimalAmount = (decimal)asset.CashoutMinimalAmount,
                 LowVolumeAmount = (decimal?)asset.LowVolumeAmount ?? 0,
                 LykkeEntityId = asset.LykkeEntityId,
-                Moment = DateTime.UtcNow
+                Moment = DateTime.UtcNow,
+                OperationId = command.OperationId
             });
 
             _chaosKitty.Meow(command.OperationId);
