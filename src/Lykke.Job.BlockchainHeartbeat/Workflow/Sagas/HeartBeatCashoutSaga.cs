@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Lykke.Common.Chaos;
@@ -6,6 +7,10 @@ using Lykke.Cqrs;
 using Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashout;
 using Lykke.Job.BlockchainHeartbeat.Workflow.Commands.HeartbeatCashout;
 using Lykke.Job.BlockchainHeartbeat.Workflow.Events.HeartbeatCashout;
+using Lykke.Service.Kyc.Abstractions.Domain.Verification;
+using Lykke.Service.Operations.Contracts;
+using Lykke.Service.Operations.Contracts.Cashout;
+using Lykke.Service.Operations.Contracts.Commands;
 
 namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
 {
@@ -32,7 +37,10 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
                     evt.ToAddressExtension,
                     evt.Amount,
                     evt.AssetId,
-                    evt.MaxCashoutInactivePeriod));
+                    evt.MaxCashoutInactivePeriod,
+                    evt.ClientId,
+                    evt.FeeCashoutTargetClientId,
+                    evt.ClientBalance));
 
             _chaosKitty.Meow(evt.OperationId);
 
@@ -97,13 +105,10 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
 
             if (aggregate.OnPreconditionPassed(evt.Moment))
             {
-                sender.SendCommand(new StartCryptoCashoutCommand
+                sender.SendCommand(new RetrieveAssetInfoCommand
                 {
-                    OperationId = aggregate.OperationId,
                     AssetId = aggregate.AssetId,
-                    Amount = aggregate.Amount,
-                    ToAddress = aggregate.ToAddress,
-                    ToAddressExtension = aggregate.ToAddressExtension
+                    OperationId = aggregate.OperationId
                 }, BoundedContext);
 
                 _chaosKitty.Meow(evt.OperationId);
@@ -133,6 +138,78 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
         }
 
         #endregion
+
+        public async Task Handle(AssetInfoRetrievedEvent evt, ICommandSender sender)
+        {
+            var aggregate = await _repository.GetAsync(evt.OperationId);
+
+            if (aggregate.OnAssetInfoRetrieved(evt.Moment,
+                evt.DisplayId,
+                evt.MultiplierPower,
+                evt.AssetAddress,
+                evt.Accuracy,
+                evt.Blockchain,
+                evt.Type,
+                evt.IsTradable,
+                evt.IsTrusted,
+                evt.KycNeeded,
+                evt.BlockchainIntegrationLayerId,
+                evt.CashoutMinimalAmount,
+                evt.LowVolumeAmount,
+                evt.BlockchainWithdrawal,
+                evt.LykkeEntityId))
+            {
+                sender.SendCommand(new CreateCashoutCommand
+                {
+                    OperationId = aggregate.OperationId,
+                    DestinationAddress = aggregate.ToAddress,
+                    DestinationAddressExtension = aggregate.ToAddressExtension,
+                    Volume = aggregate.Amount,
+                    Asset = new AssetCashoutModel
+                    {
+                        Id = aggregate.AssetId,
+                        DisplayId = aggregate.AssetDisplayId,
+                        MultiplierPower = aggregate.AssetMultiplierPower ?? throw new ArgumentNullException(nameof(aggregate.AssetMultiplierPower)),
+                        AssetAddress = aggregate.AssetAddress,
+                        Accuracy = aggregate.AssetAccuracy ?? throw new ArgumentNullException(nameof(aggregate.AssetAccuracy)),
+                        BlockchainIntegrationLayerId = aggregate.AssetBlockchainIntegrationLayerId,
+                        Blockchain = aggregate.AssetBlockchain,
+                        Type = aggregate.AssetType,
+                        IsTradable = aggregate.AssetIsTradable ?? throw new ArgumentNullException(nameof(aggregate.AssetIsTradable)),
+                        IsTrusted = aggregate.AssetIsTrusted ?? throw new ArgumentNullException(nameof(aggregate.AssetIsTrusted)),
+                        KycNeeded = aggregate.AssetKycNeeded ?? throw new ArgumentNullException(nameof(aggregate.AssetKycNeeded)),
+                        BlockchainWithdrawal = aggregate.AssetBlockchainWithdrawal ?? throw new ArgumentNullException(nameof(aggregate.AssetBlockchainWithdrawal)),
+                        CashoutMinimalAmount = aggregate.AssetCashoutMinimalAmount ?? throw new ArgumentNullException(nameof(aggregate.AssetCashoutMinimalAmount)),
+                        LowVolumeAmount = aggregate.AssetLowVolumeAmount ?? throw new ArgumentNullException(nameof(aggregate.AssetLowVolumeAmount)),
+                        LykkeEntityId = aggregate.AssetLykkeEntityId ?? throw new ArgumentNullException(nameof(aggregate.AssetLykkeEntityId))
+                    },
+                    Client = new ClientCashoutModel
+                    {
+                        Id = aggregate.ClientId,
+                        Balance = decimal.MaxValue,
+                        CashOutBlocked = false,
+                        KycStatus = KycStatus.Ok.ToString(),
+                        ConfirmationType = "google"
+                    },
+                    GlobalSettings = new GlobalSettingsCashoutModel
+                    {
+                        TwoFactorEnabled = false,
+                        CashOutBlocked = false, // TODO
+
+                        FeeSettings = new FeeSettingsCashoutModel
+                        {
+                            TargetClients = new Dictionary<string, string>
+                            {
+                                { "Cashout", aggregate.FeeCashoutTargetClientId }
+                            }
+                        },
+                    }
+                }, OperationsBoundedContext.Name);
+                _chaosKitty.Meow(aggregate.OperationId);
+
+                await _repository.SaveAsync(aggregate);
+            }
+        }
 
         #region CashoutFinishEvents
 

@@ -1,21 +1,26 @@
-﻿using Autofac;
+﻿using System;
+using System.Net.Http;
+using Autofac;
 using Lykke.Common.Chaos;
 using Lykke.Job.BlockchainHeartbeat.Core.Services;
 using Lykke.Job.BlockchainHeartbeat.Services;
-using Lykke.Job.BlockchainHeartbeat.Services.WalletApiV2;
+using Lykke.Job.BlockchainHeartbeat.Settings;
 using Lykke.Job.BlockchainHeartbeat.Settings.JobSettings;
 using Lykke.Job.BlockchainHeartbeat.Workflow.PeriodicalHandlers;
 using Lykke.Job.BlockchainHeartbeat.Workflow.Settings;
+using Lykke.Service.Assets.Client;
 
 namespace Lykke.Job.BlockchainHeartbeat.Modules
 {
     public class JobModule : Module
     {
         private readonly BlockchainHeartbeatSettings _settings;
+        private readonly AssetServiceClientSettings _assetServiceClientSettings;
 
-        public JobModule(BlockchainHeartbeatSettings settings)
+        public JobModule(BlockchainHeartbeatSettings settings, AssetServiceClientSettings assetServiceClientSettings)
         {
             _settings = settings;
+            _assetServiceClientSettings = assetServiceClientSettings;
         }
 
         protected override void Load(ContainerBuilder builder)
@@ -30,17 +35,9 @@ namespace Lykke.Job.BlockchainHeartbeat.Modules
             builder.RegisterType<ShutdownManager>()
                 .As<IShutdownManager>();
             
-            builder.RegisterType<WalletApiV2Provider>()
-                .WithParameter(TypedParameter.From(_settings.WalletApiV2Url))
-                .As<IWalletApiV2Provider>();
-
-            builder.RegisterInstance(new CryptoCashoutUserSettings
-            {
-                ClientInfo = _settings.Cashout.User.ClientInfo,
-                Email = _settings.Cashout.User.Email,
-                PartnerId = _settings.Cashout.User.PartnerId,
-                Password = _settings.Cashout.User.Password
-            }).SingleInstance();
+            builder.RegisterInstance(new AssetsService(new Uri(_assetServiceClientSettings.ServiceUrl), new HttpClient()))
+                .As<IAssetsService>()
+                .SingleInstance();
 
             builder.RegisterChaosKitty(_settings.ChaosKitty);
 
@@ -52,7 +49,10 @@ namespace Lykke.Job.BlockchainHeartbeat.Modules
                     AssetId = assetSettings.AssetId,
                     ToAddress = assetSettings.ToAddress,
                     ToAddressExtension = assetSettings.ToAddressExtensions,
-                    MaxCashoutInactivePeriod = assetSettings.MaxCashoutInactivePeriod
+                    MaxCashoutInactivePeriod = assetSettings.MaxCashoutInactivePeriod,
+                    ClientId =  _settings.Cashout.User.ClientId,
+                    FeeCashoutTargetClientId = _settings.Cashout.FeeCashoutTargetClientId,
+                    ClientBalance = _settings.Cashout.User.Balance
                 };
 
                 builder.RegisterType<HeartbeatCashoutPeriodicalHandler>()

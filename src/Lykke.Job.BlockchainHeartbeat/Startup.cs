@@ -96,7 +96,7 @@ namespace Lykke.Job.BlockchainHeartbeat
 
                 var modules = new IModule[]
                 {
-                    new JobModule(appSettings.BlockchainHeartbeatJob),
+                    new JobModule(appSettings.BlockchainHeartbeatJob, appSettings.AssetsServiceClient),
                     new CqrsModule(appSettings.BlockchainHeartbeatJob.Cqrs), 
                     new RepositoriesModule(settingsManager.Nested(p=>p.BlockchainHeartbeatJob.Db)) 
                 };

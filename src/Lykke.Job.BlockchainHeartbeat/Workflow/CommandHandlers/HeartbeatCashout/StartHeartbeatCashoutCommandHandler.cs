@@ -24,7 +24,11 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.CommandHandlers.HeartbeatCashou
                 Amount = command.Amount,
                 AssetId = command.AssetId,
                 ToAddress = command.ToAddress,
-                MaxCashoutInactivePeriod = command.MaxCashoutInactivePeriod
+                MaxCashoutInactivePeriod = command.MaxCashoutInactivePeriod,
+                ClientId =  command.ClientId,
+                ToAddressExtension = command.ToAddressExtension,
+                FeeCashoutTargetClientId = command.FeeCashoutTargetClientId,
+                ClientBalance = command.ClientBalance
             });
 
             _chaosKitty.Meow(command.OperationId);

@@ -21,8 +21,5 @@ namespace Lykke.Job.BlockchainHeartbeat.Settings.JobSettings
 
         [UsedImplicitly(ImplicitUseKindFlags.Assign)]
         public CashoutSettings Cashout { get; set; }
-
-        [UsedImplicitly(ImplicitUseKindFlags.Assign)]
-        public string WalletApiV2Url { get; set; }
     }
 }

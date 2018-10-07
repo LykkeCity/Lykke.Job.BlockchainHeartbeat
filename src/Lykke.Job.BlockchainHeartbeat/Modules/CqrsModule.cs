@@ -16,6 +16,7 @@ using Lykke.Messaging.Contract;
 using Lykke.Messaging.RabbitMq;
 using Lykke.Messaging.Serialization;
 using Lykke.Service.Operations.Contracts;
+using Lykke.Service.Operations.Contracts.Commands;
 
 namespace Lykke.Job.BlockchainHeartbeat.Modules
 {
@@ -69,8 +70,9 @@ namespace Lykke.Job.BlockchainHeartbeat.Modules
             builder.RegisterType<AcquireCashoutLockCommandHandler>();
             builder.RegisterType<ReleaseCashoutLockCommandHandler>();
             builder.RegisterType<StartHeartbeatCashoutCommandHandler>();
-            builder.RegisterType<StartCryptoCashoutCommandHandler>();
             builder.RegisterType<CheckCashoutPreconditionsCommandHandler>();
+            builder.RegisterType<RetrieveAssetInfoCommandHandler>();
+            
 
             builder.Register(CreateEngine)
                 .As<ICqrsEngine>()
@@ -148,9 +150,11 @@ namespace Lykke.Job.BlockchainHeartbeat.Modules
                     .PublishingEvents(typeof(CashoutLastMomentRegisteredEvent))
                     .With(eventsRoute)
 
-                    .ListeningCommands(typeof(StartCryptoCashoutCommand))
+                    .ListeningCommands(typeof(RetrieveAssetInfoCommand))
                     .On(defaultRoute)
-                    .WithCommandsHandler<StartCryptoCashoutCommandHandler>()
+                    .WithCommandsHandler<RetrieveAssetInfoCommandHandler>()
+                    .PublishingEvents(typeof(AssetInfoRetrievedEvent))
+                    .With(eventsRoute)
 
                     .ListeningCommands(typeof(ReleaseCashoutLockCommand))
                     .On(defaultRoute)
@@ -181,10 +185,17 @@ namespace Lykke.Job.BlockchainHeartbeat.Modules
                     .ListeningEvents(typeof(CashoutPreconditionPassedEvent))
                     .From(HeartBeatCashoutSaga.BoundedContext)
                     .On(defaultRoute)
-                    .PublishingCommands(typeof(StartCryptoCashoutCommand))
+                    .PublishingCommands(typeof(RetrieveAssetInfoCommand))
                     .To(HeartBeatCashoutSaga.BoundedContext)
                     .With(commandsPipeline)
-                    
+
+                    .ListeningEvents(typeof(AssetInfoRetrievedEvent))
+                    .From(HeartBeatCashoutSaga.BoundedContext)
+                    .On(defaultRoute)
+                    .PublishingCommands(typeof(CreateCashoutCommand))
+                    .To(OperationsBoundedContext.Name)
+                    .With(commandsPipeline)
+
                     .ListeningEvents(typeof(CashoutPreconditionRejectedEvent))
                     .From(HeartBeatCashoutSaga.BoundedContext)
                     .On(defaultRoute)

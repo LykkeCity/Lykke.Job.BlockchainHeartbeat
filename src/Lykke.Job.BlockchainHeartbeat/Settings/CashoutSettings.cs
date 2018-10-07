@@ -16,5 +16,8 @@ namespace Lykke.Job.BlockchainHeartbeat.Settings
 
         [UsedImplicitly(ImplicitUseKindFlags.Assign)]
         public HeartBeatUserSettings User { get; set; }
+
+        [UsedImplicitly(ImplicitUseKindFlags.Assign)]
+        public string FeeCashoutTargetClientId { get; set; }
     }
 }

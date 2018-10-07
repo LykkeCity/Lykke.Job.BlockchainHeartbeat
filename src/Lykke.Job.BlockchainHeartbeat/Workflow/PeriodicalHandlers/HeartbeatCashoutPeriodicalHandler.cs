@@ -87,7 +87,10 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.PeriodicalHandlers
                         OperationId = opId,
                         ToAddress = _settings.ToAddress,
                         ToAddressExtension = _settings.ToAddressExtension,
-                        MaxCashoutInactivePeriod = _settings.MaxCashoutInactivePeriod
+                        MaxCashoutInactivePeriod = _settings.MaxCashoutInactivePeriod,
+                        ClientId = _settings.ClientId,
+                        FeeCashoutTargetClientId = _settings.FeeCashoutTargetClientId,
+                        ClientBalance = _settings.ClientBalance
                     }, 
                     HeartBeatCashoutSaga.BoundedContext, 
                     HeartBeatCashoutSaga.BoundedContext);

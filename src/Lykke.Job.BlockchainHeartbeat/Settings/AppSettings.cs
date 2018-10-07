@@ -16,5 +16,8 @@ namespace Lykke.Job.BlockchainHeartbeat.Settings
 
         [Optional]
         public MonitoringServiceClientSettings MonitoringServiceClient { get; set; }
+
+        [UsedImplicitly(ImplicitUseKindFlags.Assign)]
+        public AssetServiceClientSettings AssetsServiceClient { get; set; }
     }
 }
