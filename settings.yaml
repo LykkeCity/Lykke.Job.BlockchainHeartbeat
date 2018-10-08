@@ -27,7 +27,7 @@ BlockchainHeartbeatJob:
             TimerPeriod:
                 settings-key: BlockchaiHeartbeatJob-Cashout-TimerPeriod
             Assets:
-                    settings-key: BlockchainSettingsService-Cashout-Assets
+                    settings-key: BlockchaiHeartbeatJob-Cashout-Assets
                     types: 
                         - JsonArray                                          
 SlackNotifications:
