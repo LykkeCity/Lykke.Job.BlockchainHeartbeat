@@ -15,23 +15,23 @@ BlockchainHeartbeatJob:
             settings-key: LogsConnString
             types:
                 - AzureTableStorage
-        ChaosKitty:
-            StateOfChaos:
-                settings-key: BlockchaiHeartbeatJob-ChaosKittyState
-        Cashout:
-            FeeCashoutTargetClientId:
-                settings-key: BlockchaiHeartbeatJob-Cashout-FeeCashoutTargetClientId
-            User:
-                ClientId:
-                    settings-key: BlockchaiHeartbeatJob-Cashout-User-ClientId
-                Balance:
-                    settings-key: BlockchaiHeartbeatJob-Cashout-User-Balance
-            TimerPeriod:
-                settings-key: BlockchaiHeartbeatJob-Cashout-TimerPeriod
-            Assets:
-                    settings-key: BlockchaiHeartbeatJob-Cashout-Assets
-                    types: 
-                        - JsonArray                                          
+    ChaosKitty:
+        StateOfChaos:
+            settings-key: BlockchaiHeartbeatJob-ChaosKittyState
+    Cashout:
+        FeeCashoutTargetClientId:
+            settings-key: BlockchaiHeartbeatJob-Cashout-FeeCashoutTargetClientId
+        User:
+            ClientId:
+                settings-key: BlockchaiHeartbeatJob-Cashout-User-ClientId
+            Balance:
+                settings-key: BlockchaiHeartbeatJob-Cashout-User-Balance
+        TimerPeriod:
+            settings-key: BlockchaiHeartbeatJob-Cashout-TimerPeriod
+        Assets:
+                settings-key: BlockchaiHeartbeatJob-Cashout-Assets
+                types: 
+                    - JsonArray                                          
 SlackNotifications:
     AzureQueue:
         ConnectionString:
