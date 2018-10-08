@@ -1,6 +1,6 @@
 BlockchainHeartbeatJob:
     Cqrs:
-        RabbitConnString:
+        RabbitConnectionString:
             settings-key: CqrsRabbitConnString
             types:
                 - RabbitMq
