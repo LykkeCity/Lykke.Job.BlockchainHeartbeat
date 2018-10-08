@@ -16,7 +16,7 @@ BlockchainHeartbeatJob:
         ChaosKitty:
             StateOfChaos:
                 settings-key: BlockchaiHeartbeatJob-ChaosKittyState
-        Cashout
+        Cashout:
             FeeCashoutTargetClientId:
                 settings-key: BlockchaiHeartbeatJob-Cashout-FeeCashoutTargetClientId
             User:
