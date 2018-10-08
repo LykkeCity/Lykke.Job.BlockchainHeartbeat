@@ -4,6 +4,8 @@ BlockchainHeartbeatJob:
             settings-key: CqrsRabbitConnString
             types:
                 - RabbitMq
+        RetryDelay:        
+            settings-key: BlockchainHeartbeatJob-Cqrs-RetryDelay
     Db:
         DataConnString:
             settings-key: BlockchaiHeartbeatJob-DataConnString
