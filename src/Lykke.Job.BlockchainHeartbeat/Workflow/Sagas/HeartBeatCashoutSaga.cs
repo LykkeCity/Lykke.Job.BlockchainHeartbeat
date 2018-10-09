@@ -204,7 +204,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
                             }
                         },
                     }
-                }, OperationsHeartbeatCashoutBoundedContext.Name.Name);
+                }, OperationsBoundedContext.Name);
                 _chaosKitty.Meow(aggregate.OperationId);
 
                 await _repository.SaveAsync(aggregate);
