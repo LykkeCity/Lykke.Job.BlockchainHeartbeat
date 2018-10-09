@@ -5,6 +5,7 @@ using JetBrains.Annotations;
 using Lykke.Common.Chaos;
 using Lykke.Cqrs;
 using Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashout;
+using Lykke.Job.BlockchainHeartbeat.Workflow.BoundedContexts;
 using Lykke.Job.BlockchainHeartbeat.Workflow.Commands.HeartbeatCashout;
 using Lykke.Job.BlockchainHeartbeat.Workflow.Events.HeartbeatCashout;
 using Lykke.Service.Kyc.Abstractions.Domain.Verification;
@@ -19,7 +20,6 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
         private readonly IChaosKitty _chaosKitty;
         private readonly IHeartbeatCashoutRepository _repository;
 
-        public static string BoundedContext = "bcn-integration.cashout-heartbeat";
 
         public HeartBeatCashoutSaga(IChaosKitty chaosKitty, IHeartbeatCashoutRepository repository)
         {
@@ -51,7 +51,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
                         OperationId = evt.OperationId,
                         AssetId = evt.AssetId
                     },
-                    BoundedContext);
+                    HeartbeatCashoutBoundedContext.Name);
                 
                 _chaosKitty.Meow(evt.OperationId);
 
@@ -73,7 +73,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
                     OperationId = aggregate.OperationId,
                     AssetId = aggregate.AssetId,
                     MaxCashoutInactivePeriod = aggregate.MaxCashoutInactivePeriod
-                }, BoundedContext);
+                }, HeartbeatCashoutBoundedContext.Name);
 
                 _chaosKitty.Meow(evt.OperationId);
 
@@ -109,7 +109,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
                 {
                     AssetId = aggregate.AssetId,
                     OperationId = aggregate.OperationId
-                }, BoundedContext);
+                }, HeartbeatCashoutBoundedContext.Name);
 
                 _chaosKitty.Meow(evt.OperationId);
 
@@ -129,7 +129,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
                         AssetId = aggregate.AssetId,
                         OperationId = aggregate.OperationId
                     },
-                    BoundedContext);
+                    HeartbeatCashoutBoundedContext.Name);
 
                 _chaosKitty.Meow(evt.OperationId);
 
@@ -204,7 +204,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
                             }
                         },
                     }
-                }, OperationsBoundedContext.Name);
+                }, OperationsHeartbeatCashoutBoundedContext.Name.Name);
                 _chaosKitty.Meow(aggregate.OperationId);
 
                 await _repository.SaveAsync(aggregate);
@@ -252,7 +252,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
                     AssetId = aggregate.AssetId,
                     Moment = aggregate.StartMoment,
                     OperationId = aggregate.OperationId
-                }, BoundedContext);
+                }, HeartbeatCashoutBoundedContext.Name);
 
                 _chaosKitty.Meow(operationId);
 
@@ -274,7 +274,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
                         AssetId = aggregate.AssetId,
                         OperationId = aggregate.OperationId
                     },
-                    BoundedContext);
+                    HeartbeatCashoutBoundedContext.Name);
 
                 _chaosKitty.Meow(evt.OperationId);
 

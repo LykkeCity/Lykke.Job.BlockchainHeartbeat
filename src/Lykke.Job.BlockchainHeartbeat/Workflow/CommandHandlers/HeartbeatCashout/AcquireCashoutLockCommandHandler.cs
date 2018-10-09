@@ -23,15 +23,16 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.CommandHandlers.HeartbeatCashou
         public async Task<CommandHandlingResult> Handle(AcquireCashoutLockCommand command,
             IEventPublisher publisher)
         {
-            if(await _cashoutLockRepository.TryGetLockAsync(command.AssetId, 
-                command.OperationId))
+            var lockMoment = DateTime.UtcNow;
+            if (await _cashoutLockRepository.TryLockAsync(command.AssetId, 
+                command.OperationId, lockMoment))
             {
                 _chaosKitty.Meow(command.OperationId);
 
                 publisher.PublishEvent(new CashoutLockAcquiredEvent
                 {
                     OperationId = command.OperationId,
-                    Moment = DateTime.UtcNow
+                    Moment = lockMoment
                 });
             }
             else

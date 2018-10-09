@@ -5,6 +5,7 @@ using Lykke.Cqrs;
 using Lykke.Cqrs.Configuration;
 using Lykke.Job.BlockchainCashoutProcessor.Contract;
 using Lykke.Job.BlockchainHeartbeat.Settings.JobSettings;
+using Lykke.Job.BlockchainHeartbeat.Workflow.BoundedContexts;
 using Lykke.Job.BlockchainHeartbeat.Workflow.CommandHandlers.CashoutRegistration;
 using Lykke.Job.BlockchainHeartbeat.Workflow.CommandHandlers.HeartbeatCashout;
 using Lykke.Job.BlockchainHeartbeat.Workflow.Commands.CashoutRegistration;
@@ -100,7 +101,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Modules
                     "RabbitMq",
                     SerializationFormat.MessagePack,
                     environment: "lykke")),
-                Register.BoundedContext(CashoutRegistrationSaga.BoundedContext)
+                Register.BoundedContext(CashoutRegistrationBoundedContext.Name)
                     .FailedCommandRetryDelay(defaultRetryDelay)
 
                     .ListeningCommands(typeof(RegisterCashoutRegistrationLastMomentCommand))
@@ -110,7 +111,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Modules
                     .ProcessingOptions(defaultRoute).MultiThreaded(4).QueueCapacity(1024)
                     .ProcessingOptions(eventsRoute).MultiThreaded(4).QueueCapacity(1024),
 
-                Register.Saga<CashoutRegistrationSaga>($"{CashoutRegistrationSaga.BoundedContext}.saga")
+                Register.Saga<CashoutRegistrationSaga>($"{CashoutRegistrationBoundedContext.Name}.saga")
                     .ListeningEvents(
                         typeof(BlockchainCashoutProcessor.Contract.Events.CashoutStartedEvent),
                         typeof(BlockchainCashoutProcessor.Contract.Events.CashoutFailedEvent),
@@ -118,11 +119,11 @@ namespace Lykke.Job.BlockchainHeartbeat.Modules
                     .From(BlockchainCashoutProcessorBoundedContext.Name)
                     .On(defaultRoute)
                     .PublishingCommands(typeof(RegisterCashoutRegistrationLastMomentCommand))
-                    .To(CashoutRegistrationSaga.BoundedContext)
+                    .To(CashoutRegistrationBoundedContext.Name)
                     .With(commandsPipeline)
                 ,
 
-                Register.BoundedContext(HeartBeatCashoutSaga.BoundedContext)
+                Register.BoundedContext(HeartbeatCashoutBoundedContext.Name)
                     .FailedCommandRetryDelay(defaultRetryDelay)
 
                     .ListeningCommands(typeof(StartHeartbeatCashoutCommand))
@@ -158,49 +159,50 @@ namespace Lykke.Job.BlockchainHeartbeat.Modules
 
                     .ListeningCommands(typeof(ReleaseCashoutLockCommand))
                     .On(defaultRoute)
+                    .WithLoopback()
                     .WithCommandsHandler<ReleaseCashoutLockCommandHandler>()
 
                     .ProcessingOptions(defaultRoute).MultiThreaded(4).QueueCapacity(1024)
                     .ProcessingOptions(eventsRoute).MultiThreaded(4).QueueCapacity(1024),
 
-                Register.Saga<HeartBeatCashoutSaga>($"{HeartBeatCashoutSaga.BoundedContext}.saga")
+                Register.Saga<HeartBeatCashoutSaga>($"{HeartbeatCashoutBoundedContext.Name}.saga")
                     .ListeningEvents(typeof(HeartbeatCashoutStartedEvent))
-                    .From(HeartBeatCashoutSaga.BoundedContext)
+                    .From(HeartbeatCashoutBoundedContext.Name)
                     .On(defaultRoute)
                     .PublishingCommands(typeof(AcquireCashoutLockCommand))
-                    .To(HeartBeatCashoutSaga.BoundedContext)
+                    .To(HeartbeatCashoutBoundedContext.Name)
                     .With(commandsPipeline)
 
                     .ListeningEvents(typeof(CashoutLockAcquiredEvent))
-                    .From(HeartBeatCashoutSaga.BoundedContext)
+                    .From(HeartbeatCashoutBoundedContext.Name)
                     .On(defaultRoute)
                     .PublishingCommands(typeof(CheckCashoutPreconditionsCommand))
-                    .To(HeartBeatCashoutSaga.BoundedContext)
+                    .To(HeartbeatCashoutBoundedContext.Name)
                     .With(commandsPipeline)
 
                     .ListeningEvents(typeof(CashoutLockRejectedEvent))
-                    .From(HeartBeatCashoutSaga.BoundedContext)
+                    .From(HeartbeatCashoutBoundedContext.Name)
                     .On(defaultRoute)
 
                     .ListeningEvents(typeof(CashoutPreconditionPassedEvent))
-                    .From(HeartBeatCashoutSaga.BoundedContext)
+                    .From(HeartbeatCashoutBoundedContext.Name)
                     .On(defaultRoute)
                     .PublishingCommands(typeof(RetrieveAssetInfoCommand))
-                    .To(HeartBeatCashoutSaga.BoundedContext)
+                    .To(HeartbeatCashoutBoundedContext.Name)
                     .With(commandsPipeline)
 
                     .ListeningEvents(typeof(AssetInfoRetrievedEvent))
-                    .From(HeartBeatCashoutSaga.BoundedContext)
+                    .From(HeartbeatCashoutBoundedContext.Name)
                     .On(defaultRoute)
                     .PublishingCommands(typeof(CreateCashoutCommand))
                     .To(OperationsBoundedContext.Name)
                     .With(commandsPipeline)
 
                     .ListeningEvents(typeof(CashoutPreconditionRejectedEvent))
-                    .From(HeartBeatCashoutSaga.BoundedContext)
+                    .From(HeartbeatCashoutBoundedContext.Name)
                     .On(defaultRoute)
                     .PublishingCommands(typeof(ReleaseCashoutLockCommand))
-                    .To(HeartBeatCashoutSaga.BoundedContext)
+                    .To(HeartbeatCashoutBoundedContext.Name)
                     .With(commandsPipeline)
 
                     .ListeningEvents(
@@ -210,14 +212,14 @@ namespace Lykke.Job.BlockchainHeartbeat.Modules
                     .From(OperationsBoundedContext.Name)
                     .On(defaultRoute)
                     .PublishingCommands(typeof(RegisterHeartbeatCashoutLastMomentCommand))
-                    .To(HeartBeatCashoutSaga.BoundedContext)
+                    .To(HeartbeatCashoutBoundedContext.Name)
                     .With(commandsPipeline)
 
                     .ListeningEvents(typeof(CashoutLastMomentRegisteredEvent))
-                    .From(HeartBeatCashoutSaga.BoundedContext)
+                    .From(HeartbeatCashoutBoundedContext.Name)
                     .On(defaultRoute)
                     .PublishingCommands(typeof(ReleaseCashoutLockCommand))
-                    .To(HeartBeatCashoutSaga.BoundedContext)
+                    .To(HeartbeatCashoutBoundedContext.Name)
                     .With(commandsPipeline)
                 );
         }

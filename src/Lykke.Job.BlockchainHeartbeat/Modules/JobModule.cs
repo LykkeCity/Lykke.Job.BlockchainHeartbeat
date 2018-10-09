@@ -52,12 +52,19 @@ namespace Lykke.Job.BlockchainHeartbeat.Modules
                     MaxCashoutInactivePeriod = assetSettings.MaxCashoutInactivePeriod,
                     ClientId =  _settings.Cashout.User.ClientId,
                     FeeCashoutTargetClientId = _settings.Cashout.FeeCashoutTargetClientId,
-                    ClientBalance = _settings.Cashout.User.Balance
+                    ClientBalance = _settings.Cashout.User.Balance,
+                    ExecutionTimeout = assetSettings.ExecutionTimeout,
                 };
 
-                builder.RegisterType<HeartbeatCashoutPeriodicalHandler>()
+                builder.RegisterType<HeartbeatCashoutStarterPeriodicalHandler>()
                     .WithParameter(TypedParameter.From(periodicalHandlerSettings))
                     .WithParameter(TypedParameter.From(_settings.Cashout.TimerPeriod))
+                    .As<IStartable>()
+                    .SingleInstance();
+
+                builder.RegisterType<HeartbeatCashoutTimeoutFinisherPeriodicalHandler>()
+                    .WithParameter(TypedParameter.From(periodicalHandlerSettings))
+                    .WithParameter(TypedParameter.From(assetSettings.ExecutionTimeoutTimerPeriod))
                     .As<IStartable>()
                     .SingleInstance();
             }

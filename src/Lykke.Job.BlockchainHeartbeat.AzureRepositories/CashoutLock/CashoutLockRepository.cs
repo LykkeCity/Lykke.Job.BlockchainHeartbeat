@@ -27,7 +27,7 @@ namespace Lykke.Job.BlockchainHeartbeat.AzureRepositories.CashoutLock
             _storage = storage;
         }
 
-        public async Task<bool> TryGetLockAsync(string assetId, Guid operationId)
+        public async Task<bool> TryLockAsync(string assetId, Guid operationId, DateTime lockedAt)
         {
             var partitionKey = CashoutLockEntity.GetPartitionKey(assetId);
             var rowKey = CashoutLockEntity.GetRowKey(assetId);
@@ -38,7 +38,8 @@ namespace Lykke.Job.BlockchainHeartbeat.AzureRepositories.CashoutLock
                     PartitionKey = partitionKey,
                     RowKey = rowKey,
                     OperationId = operationId,
-                    AssetId = assetId
+                    AssetId = assetId,
+                    LockedAt = lockedAt
                 });
 
             return lockEntity?.OperationId == operationId;
@@ -62,6 +63,20 @@ namespace Lykke.Job.BlockchainHeartbeat.AzureRepositories.CashoutLock
             var rowKey = CashoutLockEntity.GetRowKey(assetId);
 
             return await _storage.GetDataAsync(partitionKey, rowKey) != null;
+        }
+
+        public async Task<(DateTime lockedAt, Guid operationId)?> GetLockAsync(string assetId)
+        {
+            var partitionKey = CashoutLockEntity.GetPartitionKey(assetId);
+            var rowKey = CashoutLockEntity.GetRowKey(assetId);
+
+            var lockEntity = await _storage.GetDataAsync(partitionKey, rowKey);
+            if (lockEntity != null)
+            {
+                return (lockEntity.LockedAt, lockEntity.OperationId);
+            }
+
+            return  null;
         }
     }
 }

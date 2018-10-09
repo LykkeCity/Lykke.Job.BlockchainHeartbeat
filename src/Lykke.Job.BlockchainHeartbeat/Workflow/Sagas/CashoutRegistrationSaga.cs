@@ -4,6 +4,7 @@ using JetBrains.Annotations;
 using Lykke.Common.Chaos;
 using Lykke.Cqrs;
 using Lykke.Job.BlockchainHeartbeat.Core.Domain.CashoutRegistration;
+using Lykke.Job.BlockchainHeartbeat.Workflow.BoundedContexts;
 using Lykke.Job.BlockchainHeartbeat.Workflow.Commands.CashoutRegistration;
 
 namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
@@ -13,7 +14,6 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
         private readonly IChaosKitty _chaosKitty;
         private readonly ICashoutRegistrationRepository _repository;
 
-        public static string BoundedContext = "bcn-integration.cashout-heartbeat-registration";
 
         public CashoutRegistrationSaga(IChaosKitty chaosKitty, ICashoutRegistrationRepository repository)
         {
@@ -38,7 +38,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
                     Moment = aggregate.StartMoment ?? throw new ArgumentNullException(nameof(aggregate.StartMoment)),
                     OperationId = aggregate.OperationId
                 },
-                BoundedContext);
+                CashoutRegistrationBoundedContext.Name);
 
             _chaosKitty.Meow(evt.OperationId);
 
@@ -61,7 +61,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
                     Moment = aggregate.FinishMoment ?? throw new ArgumentNullException(nameof(aggregate.FinishMoment)),
                     OperationId = aggregate.OperationId
                 },
-                BoundedContext);
+                CashoutRegistrationBoundedContext.Name);
 
             _chaosKitty.Meow(evt.OperationId);
 
@@ -84,7 +84,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
                     Moment = aggregate.FinishMoment ?? throw new ArgumentNullException(nameof(aggregate.FinishMoment)),
                     OperationId = aggregate.OperationId
                 },
-                BoundedContext);
+                CashoutRegistrationBoundedContext.Name);
 
             _chaosKitty.Meow(evt.OperationId);
 

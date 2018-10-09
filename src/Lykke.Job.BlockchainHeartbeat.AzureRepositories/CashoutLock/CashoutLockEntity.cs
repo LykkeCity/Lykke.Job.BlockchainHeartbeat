@@ -8,6 +8,8 @@ namespace Lykke.Job.BlockchainHeartbeat.AzureRepositories.CashoutLock
         public string AssetId { get; set; }
 
         public Guid OperationId { get; set; }
+        
+        public DateTime LockedAt { get; set; }
 
         public static string GetPartitionKey(string assetId)
         {

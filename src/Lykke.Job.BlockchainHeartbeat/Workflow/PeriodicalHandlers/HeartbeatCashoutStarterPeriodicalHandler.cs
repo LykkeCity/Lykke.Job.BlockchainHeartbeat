@@ -8,13 +8,14 @@ using Lykke.Common.Log;
 using Lykke.Cqrs;
 using Lykke.Job.BlockchainHeartbeat.Core.Domain.CashoutLock;
 using Lykke.Job.BlockchainHeartbeat.Core.Domain.LastCashoutEventMoment;
+using Lykke.Job.BlockchainHeartbeat.Workflow.BoundedContexts;
 using Lykke.Job.BlockchainHeartbeat.Workflow.Commands.HeartbeatCashout;
 using Lykke.Job.BlockchainHeartbeat.Workflow.Sagas;
 using Lykke.Job.BlockchainHeartbeat.Workflow.Settings;
 
 namespace Lykke.Job.BlockchainHeartbeat.Workflow.PeriodicalHandlers
 {
-    public class HeartbeatCashoutPeriodicalHandler:IStartable, IStopable
+    public class HeartbeatCashoutStarterPeriodicalHandler:IStartable, IStopable
     {
         private readonly ITimerTrigger _timer;
         private readonly HeartbeatCashoutPeriodicalHandlerSettings _settings;
@@ -24,7 +25,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.PeriodicalHandlers
         private readonly ICqrsEngine _cqrsEngine;
         private readonly ILog _log;
 
-        public HeartbeatCashoutPeriodicalHandler(
+        public HeartbeatCashoutStarterPeriodicalHandler(
             HeartbeatCashoutPeriodicalHandlerSettings settings,
             TimeSpan timerPeriod,
             ILogFactory logFactory, 
@@ -39,7 +40,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.PeriodicalHandlers
             _log = logFactory.CreateLog(this);
 
             _timer = new TimerTrigger(
-                $"{nameof(HeartbeatCashoutPeriodicalHandler)} : {settings.AssetId}",
+                $"{nameof(HeartbeatCashoutStarterPeriodicalHandler)} : {settings.AssetId}",
                 timerPeriod,
                 logFactory);
 
@@ -49,7 +50,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.PeriodicalHandlers
 
         public void Start()
         {
-            _log.Info($"Starting {nameof(HeartbeatCashoutPeriodicalHandler)}", 
+            _log.Info($"Starting {nameof(HeartbeatCashoutStarterPeriodicalHandler)}", 
                 context: _settings);
 
             _timer.Start();
@@ -92,8 +93,8 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.PeriodicalHandlers
                         FeeCashoutTargetClientId = _settings.FeeCashoutTargetClientId,
                         ClientBalance = _settings.ClientBalance
                     }, 
-                    HeartBeatCashoutSaga.BoundedContext, 
-                    HeartBeatCashoutSaga.BoundedContext);
+                    HeartbeatCashoutBoundedContext.Name, 
+                    HeartbeatCashoutBoundedContext.Name);
             }
         }
     }

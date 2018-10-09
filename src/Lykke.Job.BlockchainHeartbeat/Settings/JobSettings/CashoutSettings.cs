@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using JetBrains.Annotations;
-using Lykke.Job.BlockchainHeartbeat.Settings.JobSettings;
 
-namespace Lykke.Job.BlockchainHeartbeat.Settings
+namespace Lykke.Job.BlockchainHeartbeat.Settings.JobSettings
 {
     public class CashoutSettings
     {
