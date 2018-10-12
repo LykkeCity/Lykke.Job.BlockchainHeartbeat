@@ -12,7 +12,7 @@ BlockchainHeartbeatJob:
             types:
                 - AzureTableStorage
         LogsConnString:
-            settings-key: LogsConnString
+            settings-key: BlockchaiHeartbeatJob-LogsConnString
             types:
                 - AzureTableStorage
     ChaosKitty:
