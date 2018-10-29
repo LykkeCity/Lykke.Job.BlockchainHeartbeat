@@ -114,9 +114,11 @@ namespace Lykke.Job.BlockchainHeartbeat.Modules
                 Register.Saga<CashoutRegistrationSaga>($"{CashoutRegistrationBoundedContext.Name}.saga")
                     .ListeningEvents(
                         typeof(BlockchainCashoutProcessor.Contract.Events.CashoutStartedEvent),
+                        typeof(BlockchainCashoutProcessor.Contract.Events.CrossClientCashoutStartedEvent),
                         typeof(BlockchainCashoutProcessor.Contract.Events.BatchedCashoutStartedEvent),
                         typeof(BlockchainCashoutProcessor.Contract.Events.CashoutFailedEvent),
                         typeof(BlockchainCashoutProcessor.Contract.Events.CashoutCompletedEvent),
+                        typeof(BlockchainCashoutProcessor.Contract.Events.CrossClientCashoutCompletedEvent),
                         typeof(BlockchainCashoutProcessor.Contract.Events.CashoutsBatchCompletedEvent),
                         typeof(BlockchainCashoutProcessor.Contract.Events.CashoutsBatchFailedEvent))
                     .From(BlockchainCashoutProcessorBoundedContext.Name)

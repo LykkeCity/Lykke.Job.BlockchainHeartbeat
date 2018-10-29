@@ -28,6 +28,13 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
         }
 
         [UsedImplicitly]
+        private Task Handle(BlockchainCashoutProcessor.Contract.Events.CrossClientCashoutStartedEvent evt,
+            ICommandSender sender)
+        {
+            return OnStarted(evt.OperationId, evt.AssetId, DateTime.UtcNow, sender);
+        }
+
+        [UsedImplicitly]
         private Task Handle(BlockchainCashoutProcessor.Contract.Events.BatchedCashoutStartedEvent evt,
             ICommandSender sender)
         {
@@ -57,7 +64,14 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
         {
             return OnFinished(evt.BatchId, evt.AssetId, evt.StartMoment, sender);
         }
-        
+
+        [UsedImplicitly]
+        private Task Handle(BlockchainCashoutProcessor.Contract.Events.CrossClientCashoutCompletedEvent evt,
+            ICommandSender sender)
+        {
+            return OnStarted(evt.OperationId, evt.AssetId, evt.FinishMoment, sender);
+        }
+
         private async Task OnFinished(Guid operationId, string assetId, DateTime finishMoment, ICommandSender sender)
         {
             var aggregate = await _repository.GetOrAddAsync(
