@@ -14,7 +14,6 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
         private readonly IChaosKitty _chaosKitty;
         private readonly ICashoutRegistrationRepository _repository;
 
-
         public CashoutRegistrationSaga(IChaosKitty chaosKitty, ICashoutRegistrationRepository repository)
         {
             _chaosKitty = chaosKitty;
@@ -22,71 +21,83 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
         }
 
         [UsedImplicitly]
-        private async Task Handle(BlockchainCashoutProcessor.Contract.Events.CashoutStartedEvent evt,
+        private Task Handle(BlockchainCashoutProcessor.Contract.Events.CashoutStartedEvent evt,
             ICommandSender sender)
         {
+            return OnStarted(evt.OperationId, evt.AssetId, DateTime.UtcNow, sender);
+        }
+
+        [UsedImplicitly]
+        private Task Handle(BlockchainCashoutProcessor.Contract.Events.BatchedCashoutStartedEvent evt,
+            ICommandSender sender)
+        {
+            return OnStarted(evt.OperationId, evt.AssetId, DateTime.UtcNow, sender);
+        }
+
+        [UsedImplicitly]
+        private Task Handle(BlockchainCashoutProcessor.Contract.Events.CashoutCompletedEvent evt, ICommandSender sender)
+        {
+            return OnFinished(evt.OperationId, evt.AssetId, evt.StartMoment, sender);
+        }
+
+        [UsedImplicitly]
+        private  Task Handle(BlockchainCashoutProcessor.Contract.Events.CashoutFailedEvent evt, ICommandSender sender)
+        {
+            return OnFinished(evt.OperationId, evt.AssetId, evt.StartMoment, sender);
+        }
+
+        [UsedImplicitly]
+        private Task Handle(BlockchainCashoutProcessor.Contract.Events.CashoutsBatchCompletedEvent evt, ICommandSender sender)
+        {
+            return OnFinished(evt.BatchId, evt.AssetId, evt.StartMoment, sender);
+        }
+
+        [UsedImplicitly]
+        private Task Handle(BlockchainCashoutProcessor.Contract.Events.CashoutsBatchFailedEvent evt, ICommandSender sender)
+        {
+            return OnFinished(evt.BatchId, evt.AssetId, evt.StartMoment, sender);
+        }
+        
+        private async Task OnFinished(Guid operationId, string assetId, DateTime finishMoment, ICommandSender sender)
+        {
             var aggregate = await _repository.GetOrAddAsync(
-                evt.OperationId,
-                () => CashoutRegistrationAggregate.StartNew(evt.OperationId,
-                    evt.AssetId));
+                operationId,
+                () => CashoutRegistrationAggregate.StartNew(operationId,
+                    assetId));
+
+            aggregate.OnFinished(finishMoment);
+
+            sender.SendCommand(new RegisterCashoutRegistrationLastMomentCommand
+                {
+                    AssetId = aggregate.AssetId,
+                    Moment = finishMoment,
+                    OperationId = aggregate.OperationId
+                },
+                CashoutRegistrationBoundedContext.Name);
+
+            _chaosKitty.Meow(operationId);
+
+            await _repository.SaveAsync(aggregate);
+        }
+
+        private async Task OnStarted(Guid operationId, string assetId, DateTime startMoment, ICommandSender sender)
+        {
+            var aggregate = await _repository.GetOrAddAsync(
+                operationId,
+                () => CashoutRegistrationAggregate.StartNew(operationId,
+                    assetId));
 
             aggregate.OnStarted(DateTime.UtcNow);
 
             sender.SendCommand(new RegisterCashoutRegistrationLastMomentCommand
                 {
                     AssetId = aggregate.AssetId,
-                    Moment = aggregate.StartMoment ?? throw new ArgumentNullException(nameof(aggregate.StartMoment)),
+                    Moment = startMoment,
                     OperationId = aggregate.OperationId
                 },
                 CashoutRegistrationBoundedContext.Name);
 
-            _chaosKitty.Meow(evt.OperationId);
-
-            await _repository.SaveAsync(aggregate);
-        }
-
-        [UsedImplicitly]
-        private async Task Handle(BlockchainCashoutProcessor.Contract.Events.CashoutCompletedEvent evt, ICommandSender sender)
-        {
-            var aggregate = await _repository.GetOrAddAsync(
-                evt.OperationId,
-                () => CashoutRegistrationAggregate.StartNew(evt.OperationId, 
-                    evt.AssetId));
-
-            aggregate.OnFinished(evt.FinishMoment);
-
-            sender.SendCommand(new RegisterCashoutRegistrationLastMomentCommand
-                {
-                    AssetId = aggregate.AssetId,
-                    Moment = aggregate.FinishMoment ?? throw new ArgumentNullException(nameof(aggregate.FinishMoment)),
-                    OperationId = aggregate.OperationId
-                },
-                CashoutRegistrationBoundedContext.Name);
-
-            _chaosKitty.Meow(evt.OperationId);
-
-            await _repository.SaveAsync(aggregate);
-        }
-
-        [UsedImplicitly]
-        private async Task Handle(BlockchainCashoutProcessor.Contract.Events.CashoutFailedEvent evt, ICommandSender sender)
-        {
-            var aggregate = await _repository.GetOrAddAsync(
-                evt.OperationId,
-                () => CashoutRegistrationAggregate.StartNew(evt.OperationId,
-                    evt.AssetId));
-
-            aggregate.OnFinished(evt.FinishMoment);
-
-            sender.SendCommand(new RegisterCashoutRegistrationLastMomentCommand
-                {
-                    AssetId = aggregate.AssetId,
-                    Moment = aggregate.FinishMoment ?? throw new ArgumentNullException(nameof(aggregate.FinishMoment)),
-                    OperationId = aggregate.OperationId
-                },
-                CashoutRegistrationBoundedContext.Name);
-
-            _chaosKitty.Meow(evt.OperationId);
+            _chaosKitty.Meow(operationId);
 
             await _repository.SaveAsync(aggregate);
         }
