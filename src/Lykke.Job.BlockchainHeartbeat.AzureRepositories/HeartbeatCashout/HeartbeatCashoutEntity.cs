@@ -137,7 +137,7 @@ namespace Lykke.Job.BlockchainHeartbeat.AzureRepositories.HeartbeatCashout
         public HeartbeatCashoutAggregate ToDomain()
         {
             return HeartbeatCashoutAggregate.Restore(version: ETag,
-                startMoment: DateTime.UtcNow,
+                startMoment: StartMoment,
                 operationFinishMoment: OperationFinishMoment,
                 operationId: OperationId,
                 amount: Amount, assetId: AssetId,

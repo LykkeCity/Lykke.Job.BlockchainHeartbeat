@@ -250,7 +250,7 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
                 sender.SendCommand(new RegisterHeartbeatCashoutLastMomentCommand
                 {
                     AssetId = aggregate.AssetId,
-                    Moment = aggregate.StartMoment,
+                    Moment = aggregate.OperationFinishMoment ?? throw new ArgumentNullException(nameof(aggregate.OperationFinishMoment)),
                     OperationId = aggregate.OperationId
                 }, HeartbeatCashoutBoundedContext.Name);
 
