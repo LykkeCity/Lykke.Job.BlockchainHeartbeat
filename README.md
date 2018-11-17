@@ -1,2 +1,2 @@
 # Lykke.Job.BlockchainHeartbeat
-Proceed heartbeat cashouts to monitor system health
+Execute generic blockchain operations in the particular blockchain

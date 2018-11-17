@@ -1,0 +1,49 @@
+BlockchainHeartbeatJob:
+    Cqrs:
+        RabbitConnectionString:
+            settings-key: CqrsRabbitConnString
+            types:
+                - RabbitMq
+        RetryDelay:        
+            settings-key: BlockchainHeartbeatJob-Cqrs-RetryDelay
+    Db:
+        DataConnString:
+            settings-key: BlockchaiHeartbeatJob-DataConnString
+            types:
+                - AzureTableStorage
+        LogsConnString:
+            settings-key: BlockchaiHeartbeatJob-LogsConnString
+            types:
+                - AzureTableStorage
+    ChaosKitty:
+        StateOfChaos:
+            settings-key: BlockchaiHeartbeatJob-ChaosKittyState
+    Cashout:
+        FeeCashoutTargetClientId:
+            settings-key: BlockchaiHeartbeatJob-Cashout-FeeCashoutTargetClientId
+        User:
+            ClientId:
+                settings-key: BlockchaiHeartbeatJob-Cashout-User-ClientId
+            Balance:
+                settings-key: BlockchaiHeartbeatJob-Cashout-User-Balance
+        TimerPeriod:
+            settings-key: BlockchaiHeartbeatJob-Cashout-TimerPeriod
+        Assets:
+                settings-key: BlockchaiHeartbeatJob-Cashout-Assets
+                types: 
+                    - JsonArray                                          
+SlackNotifications:
+    AzureQueue:
+        ConnectionString:
+            settings-key: SlackNotificationsConnString
+            types:
+                - AzureTableStorage
+        QueueName:
+            settings-key: SlackQueueName
+MonitoringServiceClient:
+    MonitoringServiceUrl:
+        settings-key: MonitoringServiceUrl
+AssetsServiceClient:
+    ServiceUrl: 
+        settings-key: AssetsServiceUrl
+
