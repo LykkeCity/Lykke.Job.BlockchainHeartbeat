@@ -14,6 +14,7 @@ using Lykke.Service.Kyc.Abstractions.Domain.Verification;
 using Lykke.Service.Operations.Contracts;
 using Lykke.Service.Operations.Contracts.Cashout;
 using Lykke.Service.Operations.Contracts.Commands;
+using Lykke.Service.Operations.Contracts.Events;
 
 namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
 {
@@ -237,7 +238,9 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
         {
             if (evt.ErrorCode == "DuplicatedOperation")
             {
-                _log.Warning("Duplicated operation", context: evt);
+                _log.Warning($"Duplicated operation: {nameof(OperationFailedEvent)} ignored", context: evt);
+
+                return;
             }
 
             await HandleOperationFinishEvent(evt.OperationId, sender);
