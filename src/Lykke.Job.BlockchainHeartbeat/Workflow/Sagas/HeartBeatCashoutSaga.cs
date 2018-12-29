@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Common.Log;
 using JetBrains.Annotations;
 using Lykke.Common.Chaos;
+using Lykke.Common.Log;
 using Lykke.Cqrs;
 using Lykke.Job.BlockchainHeartbeat.Core.Domain.HeartbeatCashout;
 using Lykke.Job.BlockchainHeartbeat.Workflow.BoundedContexts;
@@ -12,6 +14,7 @@ using Lykke.Service.Kyc.Abstractions.Domain.Verification;
 using Lykke.Service.Operations.Contracts;
 using Lykke.Service.Operations.Contracts.Cashout;
 using Lykke.Service.Operations.Contracts.Commands;
+using Lykke.Service.Operations.Contracts.Events;
 
 namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
 {
@@ -19,12 +22,14 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
     {
         private readonly IChaosKitty _chaosKitty;
         private readonly IHeartbeatCashoutRepository _repository;
+        private readonly ILog _log;
 
 
-        public HeartBeatCashoutSaga(IChaosKitty chaosKitty, IHeartbeatCashoutRepository repository)
+        public HeartBeatCashoutSaga(IChaosKitty chaosKitty, IHeartbeatCashoutRepository repository, ILogFactory logFactory)
         {
             _chaosKitty = chaosKitty;
             _repository = repository;
+            _log = logFactory.CreateLog(this);
         }
 
         [UsedImplicitly]
@@ -228,10 +233,17 @@ namespace Lykke.Job.BlockchainHeartbeat.Workflow.Sagas
         }
 
         [UsedImplicitly]
-        private Task Handle(Service.Operations.Contracts.Events.OperationFailedEvent evt,
+        private async Task Handle(Service.Operations.Contracts.Events.OperationFailedEvent evt,
             ICommandSender sender)
         {
-            return HandleOperationFinishEvent(evt.OperationId, sender);
+            if (evt.ErrorCode == "DuplicatedOperation")
+            {
+                _log.Warning($"Duplicated operation: {nameof(OperationFailedEvent)} ignored", context: evt);
+
+                return;
+            }
+
+            await HandleOperationFinishEvent(evt.OperationId, sender);
         }
 
         private async Task HandleOperationFinishEvent(Guid operationId, ICommandSender sender)
